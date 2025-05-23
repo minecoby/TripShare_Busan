@@ -33,8 +33,8 @@ class MyApp extends StatelessWidget {
         // tested with just a hot reload.
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      // initialRoute: '/main',
-      // getPages: MainRouter.routes,
+      initialRoute: '/main',
+      getPages: MainRouter.routes,
       home: const MainPageView(),
     );
   }
