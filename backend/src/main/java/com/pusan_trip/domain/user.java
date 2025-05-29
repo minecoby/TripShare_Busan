@@ -14,7 +14,7 @@ public class user {
     private Long id;
 
     @Column(unique = true, nullable = false) // 중복, null 허용 안함
-    private String user_id;
+    private String userId;
 
     @Column(nullable = false)
     private String password;
@@ -24,8 +24,8 @@ public class user {
     @Column(unique = true, nullable = false) // 중복, null 허용 안함
     private String email;
 
-    public user(String user_id, String name, String password, String email){
-        this.user_id = user_id;
+    public user(String userId, String name, String password, String email){
+        this.userId = userId;
         this.name = name;
         this.password = password;
         this.email = email;
