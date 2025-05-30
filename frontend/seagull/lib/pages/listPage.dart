@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:seagull/constants/colors.dart';
+import 'package:seagull/components/postcard.dart';
 
 class ListPageView extends StatefulWidget {
   const ListPageView({super.key});
@@ -34,86 +35,113 @@ class _ListPageViewState extends State<ListPageView> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Stack(
+      body: Column(
         children: [
-          // 파란색 컨테이너 웨이브 모양양
-          ClipPath(
-            clipper: HJCustomClipper(),
-            child: Container(
-              color: MainColor,
-              height: 255,
-              width: double.infinity,
-            ),
-          ),
-          // 검색 아이콘콘
-          Positioned(
-            top: 255 - 65 - 24, // 전체 높이 - r - icon의 길이 절반
-            right: 65 - 24, // r - icon 길이 절반
-            child: Container(
-              width: 50,
-              height: 50,
-              decoration: BoxDecoration(
-                color: const Color(0xFF595959),
-                borderRadius: BorderRadius.circular(18),
+          Stack(
+            children: [
+              // 파란색 컨테이너 웨이브 모양양
+              ClipPath(
+                clipper: HJCustomClipper(),
+                child: Container(
+                  color: MainColor,
+                  height: 255,
+                  width: double.infinity,
+                ),
               ),
-              child: const Icon(
-                Icons.search_rounded,
-                color: Colors.white,
-                size: 30,
+              // 검색 아이콘콘
+              Positioned(
+                top: 255 - 65 - 24, // 전체 높이 - r - icon의 길이 절반
+                right: 65 - 24, // r - icon 길이 절반
+                child: Container(
+                  width: 50,
+                  height: 50,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF595959),
+                    borderRadius: BorderRadius.circular(18),
+                  ),
+                  child: const Icon(
+                    Icons.search_rounded,
+                    color: Colors.white,
+                    size: 30,
+                  ),
+                ),
               ),
-            ),
-          ),
-          // 상단 목록 + 작성 아이콘콘
-          Positioned(
-            top: 10,
-            left: 0,
-            right: 0,
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 10),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Icon(Icons.list_rounded, color: Colors.white, size: 33),
-                  const Icon(Icons.add_rounded, color: Colors.white, size: 33),
-                ],
-              ),
-            ),
-          ),
-          Positioned(
-            top: 255 - 65 - 24 - 40,
-            right: 65 + 10,
-            left: 20,
-            child: SizedBox(
-              height: 35,
-              child: ListView.separated(
-                scrollDirection: Axis.horizontal,
-                itemCount: _districts.length,
-                separatorBuilder: (_, __) => const SizedBox(width: 8),
-                itemBuilder: (context, idx) {
-                  final name = _districts[idx];
-                  final selected = name == _selected;
-                  return GestureDetector(
-                    onTap: () => setState(() => _selected = name),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 20,
-                        vertical: 5,
-                      ),
-                      decoration: BoxDecoration(
+              // 상단 목록 + 작성 아이콘콘
+              Positioned(
+                top: 10,
+                left: 0,
+                right: 0,
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 10),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Icon(
+                        Icons.list_rounded,
                         color: Colors.white,
-                        borderRadius: BorderRadius.circular(100),
+                        size: 33,
                       ),
-                      child: Text(
-                        name,
-                        style: TextStyle(
-                          color: selected ? MainColor : const Color(0xFFADADAD),
-                          fontWeight: selected ? FontWeight.bold : null,
-                          fontSize: 14,
+                      const Icon(
+                        Icons.add_rounded,
+                        color: Colors.white,
+                        size: 33,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              Positioned(
+                top: 255 - 65 - 24 - 40,
+                right: 65 + 10,
+                left: 20,
+                child: SizedBox(
+                  height: 35,
+                  child: ListView.separated(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: _districts.length,
+                    separatorBuilder: (_, __) => const SizedBox(width: 8),
+                    itemBuilder: (context, idx) {
+                      final name = _districts[idx];
+                      final selected = name == _selected;
+                      return GestureDetector(
+                        onTap: () => setState(() => _selected = name),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 20,
+                            vertical: 5,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(100),
+                          ),
+                          child: Text(
+                            name,
+                            style: TextStyle(
+                              color:
+                                  selected
+                                      ? MainColor
+                                      : const Color(0xFFADADAD),
+                              fontWeight: selected ? FontWeight.bold : null,
+                              fontSize: 14,
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
-                  );
-                },
+                      );
+                    },
+                  ),
+                ),
+              ),
+            ],
+          ),
+          Expanded(
+            child: Transform.translate(
+              offset: const Offset(0, -25), // 👈 원하는 만큼 위로 땡기기
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: ListView.builder(
+                  itemCount: 10,
+                  itemBuilder: (context, index) => const PostCard(),
+                ),
               ),
             ),
           ),
