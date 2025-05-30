@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:seagull/components/showmodal.dart';
 import 'package:seagull/constants/colors.dart';
 import 'package:seagull/components/postcard.dart';
+import 'package:get/get.dart';
 
 class ListPageView extends StatefulWidget {
   const ListPageView({super.key});
@@ -179,12 +180,17 @@ class _ListPageViewState extends State<ListPageView> {
           ),
           Expanded(
             child: Transform.translate(
-              offset: const Offset(0, -25), // 👈 원하는 만큼 위로 땡기기
+              offset: const Offset(0, -25),
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: ListView.builder(
                   itemCount: 10,
-                  itemBuilder: (context, index) => const PostCard(),
+                  itemBuilder:
+                      (context, index) => PostCard(
+                        onTap: () {
+                          Get.toNamed('/summation'); // 👈 여기만 바꾸면 됨!
+                        },
+                      ),
                 ),
               ),
             ),
