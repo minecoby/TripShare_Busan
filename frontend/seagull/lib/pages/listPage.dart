@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:seagull/components/showmodal.dart';
 import 'package:seagull/constants/colors.dart';
 import 'package:seagull/components/postcard.dart';
 
@@ -10,6 +11,20 @@ class ListPageView extends StatefulWidget {
 }
 
 class _ListPageViewState extends State<ListPageView> {
+  late ScrollController _scrollController;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController = ScrollController();
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
   final List<String> _districts = [
     "중구",
     "동구",
@@ -76,10 +91,38 @@ class _ListPageViewState extends State<ListPageView> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Icon(
-                        Icons.list_rounded,
-                        color: Colors.white,
-                        size: 33,
+                      IconButton(
+                        icon: const Icon(
+                          Icons.list_rounded,
+                          color: Colors.white,
+                          size: 33,
+                        ),
+                        onPressed: () {
+                          showDialog(
+                            context: context,
+                            barrierDismissible: true,
+                            barrierColor: Colors.black.withOpacity(0.3),
+                            builder: (BuildContext context) {
+                              return Dialog(
+                                backgroundColor: Color(
+                                  0xFF696666,
+                                ).withOpacity(0.8), // 투명 배경
+                                insetPadding: EdgeInsets.zero, // 전체화면처럼
+                                child: ShowModal(
+                                  districts: _districts,
+                                  onSelect: (selected) {
+                                    setState(() => _selected = selected);
+
+                                    WidgetsBinding.instance
+                                        .addPostFrameCallback((_) {
+                                          _scrollToSelectedDistrict(selected);
+                                        });
+                                  },
+                                ),
+                              );
+                            },
+                          );
+                        },
                       ),
                       const Icon(
                         Icons.add_rounded,
@@ -97,6 +140,7 @@ class _ListPageViewState extends State<ListPageView> {
                 child: SizedBox(
                   height: 35,
                   child: ListView.separated(
+                    controller: _scrollController,
                     scrollDirection: Axis.horizontal,
                     itemCount: _districts.length,
                     separatorBuilder: (_, __) => const SizedBox(width: 8),
@@ -147,6 +191,21 @@ class _ListPageViewState extends State<ListPageView> {
           ),
         ],
       ),
+    );
+  }
+
+  void _scrollToSelectedDistrict(String name) {
+    final index = _districts.indexOf(name);
+    if (index == -1) return;
+
+    const itemWidth = 90.0;
+    final screenCenter = MediaQuery.of(context).size.width / 2;
+    final scrollOffset = index * itemWidth - screenCenter + itemWidth / 2;
+
+    _scrollController.animateTo(
+      scrollOffset.clamp(0, _scrollController.position.maxScrollExtent),
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeOut,
     );
   }
 }
