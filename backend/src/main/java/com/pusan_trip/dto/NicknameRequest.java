@@ -1,0 +1,10 @@
+package com.pusan_trip.dto;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
+@Getter
+@AllArgsConstructor
+public class NicknameRequest {
+    private String newNickname;
+}
