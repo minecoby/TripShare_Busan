@@ -2,7 +2,10 @@ package com.pusan_trip.controller;
 
 import com.pusan_trip.dto.LoginRequestDto;
 import com.pusan_trip.dto.LoginResponseDto;
+import com.pusan_trip.dto.SignupRequestDto;
+import com.pusan_trip.dto.SignupResponseDto;
 import com.pusan_trip.service.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,5 +21,11 @@ public class UserController {
     public ResponseEntity<LoginResponseDto> login(@RequestBody LoginRequestDto requestDto) {
         LoginResponseDto responseDto = userService.login(requestDto);
         return ResponseEntity.ok(responseDto);
+    }
+
+    @PostMapping("/singup")
+    public ResponseEntity<SignupResponseDto> signup(@Valid  @RequestBody SignupRequestDto signupRequestDto) {
+        SignupResponseDto savedUser = userService.save(signupRequestDto);
+
     }
 }

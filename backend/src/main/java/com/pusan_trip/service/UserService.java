@@ -1,8 +1,11 @@
 package com.pusan_trip.service;
 
-import com.pusan_trip.domain.user;
+import com.pusan_trip.domain.User;
 import com.pusan_trip.dto.LoginRequestDto;
 import com.pusan_trip.dto.LoginResponseDto;
+import com.pusan_trip.dto.SignupRequestDto;
+import com.pusan_trip.dto.SignupResponseDto;
+import com.pusan_trip.exception.DuplicateUserException;
 import com.pusan_trip.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -15,7 +18,7 @@ public class UserService {
     private final BCryptPasswordEncoder passwordEncoder;
 
     public LoginResponseDto login(LoginRequestDto dto) {
-        user user = userRepository.findByUserId(dto.getUserId())
+        User user = userRepository.findByUserId(dto.getUserId())
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
 
         if (!passwordEncoder.matches(dto.getPassword(), user.getPassword())) {
@@ -23,5 +26,28 @@ public class UserService {
         }
 
         return new LoginResponseDto(user.getName(), user.getUserId(), "로그인 성공");
+    }
+
+    public SignupResponseDto signup(SignupRequestDto dto) {
+        if (userRepository.findByEmail(dto.getEmail()).isPresent()) {
+            throw new DuplicateUserException("이미 존재하는 이메일입니다.");
+        }
+
+        if (userRepository.findByUserId(dto.getUserId()).isPresent()) {
+            throw new DuplicateUserException("이미 존재하는 사용자 ID입니다.");
+        }
+
+        String encodedPassword = passwordEncoder.encode(dto.getPassword());
+
+        User user = new User(
+                dto.getUserId(),
+                encodedPassword,
+                dto.getName(),
+                dto.getEmail()
+        );
+
+        userRepository.save(user);
+
+        return new SignupResponseDto(user.getId(), user.getUserId(), user.getName());
     }
 }
