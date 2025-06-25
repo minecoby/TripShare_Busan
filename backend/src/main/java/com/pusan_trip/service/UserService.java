@@ -1,6 +1,6 @@
 package com.pusan_trip.service;
 
-import com.pusan_trip.domain.user;
+import com.pusan_trip.domain.User;
 import com.pusan_trip.dto.LoginRequestDto;
 import com.pusan_trip.dto.LoginResponseDto;
 import com.pusan_trip.dto.NicknameRequest;
@@ -19,7 +19,7 @@ public class UserService {
     private final BCryptPasswordEncoder passwordEncoder;
 
     public LoginResponseDto login(LoginRequestDto dto) {
-        user user = userRepository.findByUserId(dto.getUserId())
+        User user = userRepository.findByUserId(dto.getUserId())
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
 
         if (!passwordEncoder.matches(dto.getPassword(), user.getPassword())) {
@@ -35,7 +35,7 @@ public class UserService {
 
     @Transactional
     public void updateNickname(String userId, NicknameRequest request) {
-        user user = userRepository.findByUserId(userId)
+        User user = userRepository.findByUserId(userId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
         
         String newNickname = request.getNewNickname();
@@ -58,7 +58,7 @@ public class UserService {
 
     @Transactional
     public void updatePassword(String userId, PasswordChangeRequest request) {
-        user user = userRepository.findByUserId(userId)
+        User user = userRepository.findByUserId(userId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
 
         // 현재 비밀번호 확인
