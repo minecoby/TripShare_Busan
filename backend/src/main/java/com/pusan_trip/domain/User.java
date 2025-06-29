@@ -30,5 +30,16 @@ public class User {
         this.password = password;
         this.email = email;
     }
+
+
+    // 닉네임 변경 메서드
+    public void updateName(String newName) {
+        this.name = newName;
+    }
+
+    // 비밀번호 변경 메서드
+    public void updatePassword(String newPassword) {
+        this.password = newPassword;
+    }
 }
 
