@@ -20,7 +20,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     boolean existsByEmail(String email);
 
     // 유저네임 중복 여부 확인
-    boolean existsByname(String name);
+    boolean existsByName(String name);
 
     // 유저아이디 중복 여부 확인
     boolean existsByUserId(String userId);
