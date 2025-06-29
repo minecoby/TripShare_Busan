@@ -57,7 +57,7 @@ public class UserService {
         userRepository.save(user);
 
         return new SignupResponseDto(user.getId(), user.getUserId(), user.getName());
-
+    }
     public boolean isNicknameAvailable(String nickname) {
         return !userRepository.existsByname(nickname);
     }

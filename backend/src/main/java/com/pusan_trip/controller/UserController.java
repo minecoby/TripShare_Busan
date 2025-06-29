@@ -29,10 +29,11 @@ public class UserController {
     }
 
 
-    @PostMapping("/singup")
+    @PostMapping("/signup")
     public ResponseEntity<SignupResponseDto> signup(@Valid  @RequestBody SignupRequestDto signupRequestDto) {
-        SignupResponseDto savedUser = userService.save(signupRequestDto);
-
+        SignupResponseDto savedUser = userService.signup(signupRequestDto);
+        return ResponseEntity.ok(savedUser);
+    }
 
     @GetMapping("/check-nickname")
     public ResponseEntity<Boolean> checkNicknameAvailability(@RequestParam String nickname) {
