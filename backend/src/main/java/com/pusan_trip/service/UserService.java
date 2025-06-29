@@ -3,8 +3,14 @@ package com.pusan_trip.service;
 import com.pusan_trip.domain.User;
 import com.pusan_trip.dto.LoginRequestDto;
 import com.pusan_trip.dto.LoginResponseDto;
+
+import com.pusan_trip.dto.SignupRequestDto;
+import com.pusan_trip.dto.SignupResponseDto;
+import com.pusan_trip.exception.DuplicateUserException;
+
 import com.pusan_trip.dto.NicknameRequest;
 import com.pusan_trip.dto.PasswordChangeRequest;
+
 import com.pusan_trip.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -28,6 +34,29 @@ public class UserService {
 
         return new LoginResponseDto(user.getName(), user.getUserId(), "로그인 성공");
     }
+
+
+    public SignupResponseDto signup(SignupRequestDto dto) {
+        if (userRepository.findByEmail(dto.getEmail()).isPresent()) {
+            throw new DuplicateUserException("이미 존재하는 이메일입니다.");
+        }
+
+        if (userRepository.findByUserId(dto.getUserId()).isPresent()) {
+            throw new DuplicateUserException("이미 존재하는 사용자 ID입니다.");
+        }
+
+        String encodedPassword = passwordEncoder.encode(dto.getPassword());
+
+        User user = new User(
+                dto.getUserId(),
+                encodedPassword,
+                dto.getName(),
+                dto.getEmail()
+        );
+
+        userRepository.save(user);
+
+        return new SignupResponseDto(user.getId(), user.getUserId(), user.getName());
 
     public boolean isNicknameAvailable(String nickname) {
         return !userRepository.existsByname(nickname);
@@ -72,5 +101,6 @@ public class UserService {
         // 새 비밀번호 암호화 및 업데이트
         String encodedNewPassword = passwordEncoder.encode(request.getNewPassword());
         user.updatePassword(encodedNewPassword);
+
     }
 }
