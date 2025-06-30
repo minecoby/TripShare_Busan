@@ -26,6 +26,7 @@ public class User {
     @Column(unique = true, nullable = false) // 중복, null 허용 안함
     private String email;
 
+
     // 게시글 연관 관계 - 유저가 작성한 게시글 목록을 조회할 때 필요
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Post> posts = new ArrayList<>();

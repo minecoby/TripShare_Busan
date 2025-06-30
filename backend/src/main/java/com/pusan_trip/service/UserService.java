@@ -16,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.pusan_trip.config.JwtUtil;
 
 @Service
 @RequiredArgsConstructor
@@ -23,6 +24,7 @@ public class UserService {
     private static final int MIN_PASSWORD_LENGTH = 10;
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
+    private final JwtUtil jwtUtil;
 
     public LoginResponseDto login(LoginRequestDto dto) {
         User user = userRepository.findByUserId(dto.getUserId())
@@ -32,7 +34,8 @@ public class UserService {
             throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
         }
 
-        return new LoginResponseDto(user.getName(), user.getUserId(), "로그인 성공");
+        String accessToken = jwtUtil.generateToken(user.getUserId());
+        return new LoginResponseDto(user.getName(), user.getUserId(), accessToken);
     }
 
 
