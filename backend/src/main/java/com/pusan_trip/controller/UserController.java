@@ -43,7 +43,7 @@ public class UserController {
 
     @PutMapping("/{userId}/nickname")
     public ResponseEntity<String> updateNickname(
-            @PathVariable String userId,
+            @PathVariable Long userId,
             @RequestBody NicknameRequest request) {
         try {
             userService.updateNickname(userId, request);
@@ -55,7 +55,7 @@ public class UserController {
 
     @PutMapping("/{userId}/password")
     public ResponseEntity<String> updatePassword(
-            @PathVariable String userId,
+            @PathVariable Long userId,
             @RequestBody PasswordChangeRequest request) {
         try {
             userService.updatePassword(userId, request);
@@ -63,6 +63,5 @@ public class UserController {
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
-
     }
 }
