@@ -67,8 +67,8 @@ public class UserService {
     }
 
     @Transactional
-    public void updateNickname(String userId, NicknameRequest request) {
-        User user = userRepository.findByUserId(userId)
+    public void updateNickname(Long userId, NicknameRequest request) {
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
         
         String newNickname = request.getNewNickname();
@@ -90,13 +90,18 @@ public class UserService {
     }
 
     @Transactional
-    public void updatePassword(String userId, PasswordChangeRequest request) {
-        User user = userRepository.findByUserId(userId)
+    public void updatePassword(Long userId, PasswordChangeRequest request) {
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
 
         // 현재 비밀번호 확인
         if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {
             throw new IllegalArgumentException("현재 비밀번호가 일치하지 않습니다.");
+        }
+
+        // 새 비밀번호와 확인 비밀번호 일치 여부 확인
+        if (!request.getNewPassword().equals(request.getConfirmPassword())) {
+            throw new IllegalArgumentException("새 비밀번호와 확인 비밀번호가 일치하지 않습니다.");
         }
 
         // 새 비밀번호 유효성 검사
@@ -105,6 +110,5 @@ public class UserService {
         // 새 비밀번호 암호화 및 업데이트
         String encodedNewPassword = passwordEncoder.encode(request.getNewPassword());
         user.updatePassword(encodedNewPassword);
-
     }
 }
