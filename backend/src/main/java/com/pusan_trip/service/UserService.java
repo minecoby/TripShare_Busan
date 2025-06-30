@@ -34,8 +34,8 @@ public class UserService {
             throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
         }
 
-        String token = jwtUtil.generateToken(user.getUserId());
-        return new LoginResponseDto(user.getName(), user.getUserId(), token);
+        String accessToken = jwtUtil.generateToken(user.getUserId());
+        return new LoginResponseDto(user.getName(), user.getUserId(), accessToken);
     }
 
 
