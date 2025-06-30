@@ -30,10 +30,10 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Post> posts = new ArrayList<>();
 
-    public User(String userId, String name, String password, String email) {
+    public User(String userId, String password, String name, String email) {
         this.userId = userId;
-        this.name = name;
         this.password = password;
+        this.name = name;
         this.email = email;
     }
 
@@ -42,7 +42,7 @@ public class User {
         this.name = newName;
     }
 
-    // 비밀번호 변경 메서드
+    // 비밀번호 변경 메서드 (비밀번호 확인은 서비스 레이어에서 처리)
     public void updatePassword(String newPassword) {
         this.password = newPassword;
     }

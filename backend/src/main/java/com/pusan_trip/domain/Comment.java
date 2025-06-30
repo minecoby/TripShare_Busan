@@ -3,6 +3,9 @@ package com.pusan_trip.domain;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -25,10 +28,18 @@ public class Comment {
     @Column(nullable = false)
     private String content;
 
+    @Column(updatable = false)
+    @CreationTimestamp
+    private LocalDateTime createdAt;
 
     public Comment(Post post, User user, String content) {
         this.post = post;
         this.user = user;
         this.content = content;
     }
+
+    public void setPost(Post post) {
+        this.post = post;
+    }
+
 }

@@ -10,11 +10,11 @@ import lombok.NoArgsConstructor;
 @Table(name = "postinfo")
 public class PostInfo {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "post_id", nullable = false, unique = true)
+    @OneToOne
+    @MapsId
+    @JoinColumn(name = "post_id")
     private Post post;
 
     @Column(nullable = false)
@@ -29,4 +29,26 @@ public class PostInfo {
         this.likeCount = likeCount;
         this.seenCount = seenCount;
     }
+
+    public void setPost(Post post) {
+        this.post = post;
+        if (post.getPostInfo() != this) {
+            post.setPostInfo(this);
+        }
+    }
+
+    public void increaseSeenCount() {
+        this.seenCount++;
+    }
+
+    public void increaseLikeCount() {
+        this.likeCount++;
+    }
+
+    public void decreaseLikeCount() {
+        if (this.likeCount > 0) {
+            this.likeCount--;
+        }
+    }
+
 }
