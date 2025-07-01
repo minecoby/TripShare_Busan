@@ -2,9 +2,15 @@ package com.pusan_trip.controller;
 
 import com.pusan_trip.dto.LoginRequestDto;
 import com.pusan_trip.dto.LoginResponseDto;
+
+import com.pusan_trip.dto.SignupRequestDto;
+import com.pusan_trip.dto.SignupResponseDto;
+
 import com.pusan_trip.dto.NicknameRequest;
 import com.pusan_trip.dto.PasswordChangeRequest;
+
 import com.pusan_trip.service.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,6 +28,13 @@ public class UserController {
         return ResponseEntity.ok(responseDto);
     }
 
+
+    @PostMapping("/signup")
+    public ResponseEntity<SignupResponseDto> signup(@Valid  @RequestBody SignupRequestDto signupRequestDto) {
+        SignupResponseDto savedUser = userService.signup(signupRequestDto);
+        return ResponseEntity.ok(savedUser);
+    }
+
     @GetMapping("/check-nickname")
     public ResponseEntity<Boolean> checkNicknameAvailability(@RequestParam String nickname) {
         boolean isAvailable = userService.isNicknameAvailable(nickname);
@@ -30,7 +43,7 @@ public class UserController {
 
     @PutMapping("/{userId}/nickname")
     public ResponseEntity<String> updateNickname(
-            @PathVariable String userId,
+            @PathVariable Long userId,
             @RequestBody NicknameRequest request) {
         try {
             userService.updateNickname(userId, request);
@@ -42,7 +55,7 @@ public class UserController {
 
     @PutMapping("/{userId}/password")
     public ResponseEntity<String> updatePassword(
-            @PathVariable String userId,
+            @PathVariable Long userId,
             @RequestBody PasswordChangeRequest request) {
         try {
             userService.updatePassword(userId, request);
