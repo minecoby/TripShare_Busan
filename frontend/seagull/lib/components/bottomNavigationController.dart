@@ -15,7 +15,7 @@ class MyBottomNavigationController extends GetxController {
         Get.toNamed('/main');
         break;
       case 2:
-        Get.toNamed('/main');
+        Get.toNamed('/mypage');
         break;
     }
   }
