@@ -126,6 +126,14 @@ class SummationPage extends StatelessWidget {
                 decoration: const BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Color.fromARGB(255, 87, 87, 87),
+                      offset: Offset(0, -4), // X: 0, Y: 4
+                      blurRadius: 12,
+                      spreadRadius: 0,
+                    ),
+                  ],
                 ),
                 child: Stack(
                   children: [
