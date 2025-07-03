@@ -25,6 +25,9 @@ public class Post {
     @Column(nullable = false)
     private String content;
 
+    @Column(length = 300)
+    private String summary;
+
     @Column(updatable = false)
     @CreationTimestamp
     private LocalDateTime createdAt;
@@ -39,9 +42,10 @@ public class Post {
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments = new ArrayList<>();
 
-    public Post(String title, String content, User user, PostInfo postInfo, Comment... comments) {
+    public Post(String title, String content, String summary, User user, PostInfo postInfo, Comment... comments) {
         this.title = title;
         this.content = content;
+        this.summary = summary;
         this.user = user;
         this.postInfo = postInfo;
         this.comments = Arrays.asList(comments);

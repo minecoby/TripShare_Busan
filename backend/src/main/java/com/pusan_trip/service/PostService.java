@@ -22,14 +22,14 @@ public class PostService {
     private final PostRepository postRepository;
     private final PostInfoRepository postInfoRepository;
     private final UserRepository userRepository;
-    private final CommentRepository commentRepository;
 
     @Transactional
     public Long createPost(PostRequestDto requestDto) {
         // user, postinfo 생성 및 저장
         User user = userRepository.findById(requestDto.getUserId())
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
-        Post post = new Post(requestDto.getTitle(), requestDto.getContent(), user, null);
+        String summary = "요약본"; // summary 생성 함수로 수정 예정
+        Post post = new Post(requestDto.getTitle(), requestDto.getContent(), summary, user, null);
         PostInfo postInfo = new PostInfo(post, 0, 0);
         post.setPostInfo(postInfo);
         postRepository.save(post);
@@ -43,6 +43,10 @@ public class PostService {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new IllegalArgumentException("Post not found"));
         PostInfo postInfo = post.getPostInfo();
+        // 조회수 자동 증가
+        if (postInfo != null) {
+            postInfo.increaseSeenCount();
+        }
         List<CommentRequestDto> comments = post.getComments().stream()
                 .map(c -> new CommentRequestDto(c.getId(),  c.getUser().getId(), c.getContent()))
                 .collect(Collectors.toList());
@@ -50,6 +54,7 @@ public class PostService {
                 post.getId(),
                 post.getTitle(),
                 post.getContent(),
+                post.getSummary(),
                 post.getCreatedAt(),
                 post.getUser().getId(),
                 post.getUser().getName(),
@@ -77,6 +82,7 @@ public class PostService {
                     post.getId(),
                     post.getTitle(),
                     post.getContent(),
+                    post.getSummary(),
                     post.getCreatedAt(),
                     post.getUser().getId(),
                     post.getUser().getName(),
@@ -94,16 +100,6 @@ public class PostService {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new IllegalArgumentException("Post not found"));
         postRepository.delete(post);
-    }
-
-    @Transactional
-    public void increaseSeenCount(Long postId) {
-        Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new IllegalArgumentException("Post not found"));
-        PostInfo postInfo = post.getPostInfo();
-        if (postInfo != null) {
-            postInfo.increaseSeenCount();
-        }
     }
 
     @Transactional
