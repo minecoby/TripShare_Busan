@@ -2,12 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:seagull/components/LoginSignupInput.dart';
 import 'package:seagull/constants/colors.dart';
+import 'package:seagull/controller/LoginAndSignup/login_controller.dart';
 
 class LoginPage extends StatelessWidget {
   const LoginPage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final LoginController controller = Get.put(LoginController());
+
     return Scaffold(
       // resizeToAvoidBottomInset: false,
       backgroundColor: MainColor,
@@ -72,24 +75,35 @@ class LoginPage extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 60),
-                  const InputField(title: "ID"),
+                  InputField(title: "ID", controller: controller.idController),
                   const SizedBox(height: 15),
-                  const InputField(title: "Password", obscureText: true),
+                  InputField(
+                    title: "Password",
+                    controller: controller.pwController,
+                    obscureText: true,
+                  ),
 
                   //입력 틀렸을 경우 -> 맞는 경우 25 빈칸
                   const SizedBox(height: 3),
-                  const Text(
-                    "아이디 또는 비밀번호가 틀렸습니다",
-                    style: TextStyle(
-                      color: Colors.red,
-                      fontSize: 10,
-                      decoration: TextDecoration.underline,
-                      decorationColor: Colors.red,
-                    ),
-                  ),
+                  Obx(() {
+                    if (controller.errorMessage.value.isEmpty) {
+                      return const SizedBox(height: 25);
+                    } else {
+                      return Text(
+                        controller.errorMessage.value,
+                        style: const TextStyle(
+                          color: Colors.red,
+                          fontSize: 10,
+                          decoration: TextDecoration.underline,
+                          decorationColor: Colors.red,
+                        ),
+                      );
+                    }
+                  }),
+
                   const SizedBox(height: 3),
                   //
-                  CustomButton(label: "log in", onTap: () {}),
+                  CustomButton(label: "log in", onTap: controller.login),
                 ],
               ),
             ),

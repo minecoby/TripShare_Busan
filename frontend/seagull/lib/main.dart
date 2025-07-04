@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:seagull/router/main_router.dart';
 import 'package:seagull/pages/mainPage.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load(fileName: 'config/.env');
   runApp(const MyApp());
 }
 
@@ -34,7 +37,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         scaffoldBackgroundColor: Colors.white,
       ),
-      initialRoute: '/main',
+      initialRoute: '/login',
       getPages: MainRouter.routes,
       home: const MainPageView(),
     );
