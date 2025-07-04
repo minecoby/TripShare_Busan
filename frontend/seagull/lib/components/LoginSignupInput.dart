@@ -5,12 +5,14 @@ class InputField extends StatelessWidget {
   final String title;
   final bool obscureText;
   final TextEditingController controller;
+  final String? hint;
 
   const InputField({
     super.key,
     required this.title,
     required this.controller,
     this.obscureText = false,
+    this.hint,
   });
 
   @override
@@ -47,9 +49,11 @@ class InputField extends StatelessWidget {
           TextField(
             controller: controller,
             obscureText: obscureText,
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
               isCollapsed: true,
               border: InputBorder.none,
+              hintText: hint,
+              hintStyle: TextStyle(color: Color(0xFFD8D8D8), fontSize: 14),
             ),
             style: const TextStyle(color: TextColor, fontSize: 14),
           ),
@@ -64,6 +68,7 @@ class InputSendField extends StatelessWidget {
   final String send;
   final TextEditingController controller;
   final bool obscureText;
+  final String? hint;
 
   const InputSendField({
     super.key,
@@ -71,6 +76,7 @@ class InputSendField extends StatelessWidget {
     required this.send,
     required this.controller,
     this.obscureText = false,
+    this.hint,
   });
 
   @override
@@ -112,9 +118,14 @@ class InputSendField extends StatelessWidget {
                 child: TextField(
                   controller: controller,
                   obscureText: obscureText,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     isCollapsed: true,
                     border: InputBorder.none,
+                    hintText: hint,
+                    hintStyle: TextStyle(
+                      color: Color(0xFFD8D8D8),
+                      fontSize: 14,
+                    ),
                   ),
                   style: const TextStyle(color: TextColor, fontSize: 14),
                 ),

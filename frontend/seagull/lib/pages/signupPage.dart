@@ -58,6 +58,7 @@ class SignUpPage extends StatelessWidget {
                   InputField(
                     title: "Name",
                     controller: controller.nameController,
+                    hint: "3글자 이상 입력하세요",
                   ),
                   const SizedBox(height: 15),
                   InputField(title: "ID", controller: controller.idController),
@@ -66,6 +67,7 @@ class SignUpPage extends StatelessWidget {
                     title: "Password",
                     controller: controller.pwController,
                     obscureText: true,
+                    hint: "8글자 이상 입력하세요",
                   ),
                   const SizedBox(height: 15),
                   InputSendField(
@@ -73,6 +75,7 @@ class SignUpPage extends StatelessWidget {
                     send: "전송",
                     controller: controller.emailController,
                     obscureText: false,
+                    hint: "######@#####.com",
                   ),
                   const SizedBox(height: 15),
                   const InputSendCodeField(
@@ -85,11 +88,11 @@ class SignUpPage extends StatelessWidget {
                   //입력 틀렸을 경우 -> 맞는 경우 25 빈칸
                   Obx(() {
                     if (controller.errorMessage.value.isEmpty) {
-                      return const SizedBox(height: 25); // 메시지가 없으면 빈 공간 유지
+                      return const SizedBox(height: 23); // 메시지가 없으면 빈 공간 유지
                     } else {
                       return Column(
                         children: [
-                          const SizedBox(height: 3),
+                          const SizedBox(height: 4),
                           Text(
                             controller.errorMessage.value,
                             style: const TextStyle(
@@ -99,7 +102,7 @@ class SignUpPage extends StatelessWidget {
                               decorationColor: Colors.red,
                             ),
                           ),
-                          const SizedBox(height: 3),
+                          const SizedBox(height: 4),
                         ],
                       );
                     }
