@@ -14,7 +14,7 @@ import java.util.List;
 public class PostController {
     private final PostService postService;
 
-    // 게시글 생성
+    // 게시글 생성 (regionId도 함께 요청)
     @PostMapping
     public ResponseEntity<Long> createPost(@RequestBody PostRequestDto requestDto) {
         Long postId = postService.createPost(requestDto);
@@ -46,13 +46,6 @@ public class PostController {
     @DeleteMapping("/{postId}")
     public ResponseEntity<Void> deletePost(@PathVariable Long postId) {
         postService.deletePost(postId);
-        return ResponseEntity.ok().build();
-    }
-
-    // 조회수 증가
-    @PostMapping("/{postId}/seen")
-    public ResponseEntity<Void> increaseSeenCount(@PathVariable Long postId) {
-        postService.increaseSeenCount(postId);
         return ResponseEntity.ok().build();
     }
 
