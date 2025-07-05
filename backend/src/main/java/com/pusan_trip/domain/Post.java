@@ -36,18 +36,23 @@ public class Post {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "region_id")
+    private Region region;
+
     @OneToOne(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private PostInfo postInfo;
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments = new ArrayList<>();
 
-    public Post(String title, String content, String summary, User user, PostInfo postInfo, Comment... comments) {
+    public Post(String title, String content, String summary, User user, PostInfo postInfo, Region region, Comment... comments) {
         this.title = title;
         this.content = content;
         this.summary = summary;
         this.user = user;
         this.postInfo = postInfo;
+        this.region = region;
         this.comments = Arrays.asList(comments);
     }
     
@@ -68,4 +73,7 @@ public class Post {
         this.content = content;
     }
 
+    public void setRegion(Region region) {
+        this.region = region;
+    }
 }
