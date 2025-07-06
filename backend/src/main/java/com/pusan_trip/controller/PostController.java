@@ -14,7 +14,7 @@ import java.util.List;
 public class PostController {
     private final PostService postService;
 
-    // 게시글 생성 (regionId도 함께 요청)
+    // 게시글 생성
     @PostMapping
     public ResponseEntity<Long> createPost(@RequestBody PostRequestDto requestDto) {
         Long postId = postService.createPost(requestDto);
