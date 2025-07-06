@@ -5,10 +5,12 @@ import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import java.time.LocalDateTime;
 import java.util.List;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class PostResponseDto {
     private Long id;
     private String title;
@@ -20,6 +22,7 @@ public class PostResponseDto {
     private Integer likeCount;
     private Integer seenCount;
     private Integer commentCount;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private List<CommentRequestDto> comments;
     private String region;
 
