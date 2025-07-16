@@ -23,6 +23,7 @@ public class PostService {
     private final PostInfoRepository postInfoRepository;
     private final UserRepository userRepository;
     private final CommentRepository commentRepository;
+    private final OpenAIService openAIService;
 
     @Transactional
     public Long createPost(PostRequestDto requestDto) {
@@ -30,6 +31,11 @@ public class PostService {
         User user = userRepository.findById(requestDto.getUserId())
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
         Post post = new Post(requestDto.getTitle(), requestDto.getContent(), user, null);
+
+
+        String summary = openAIService.generateSummary(requestDto.getContent());
+        post.setSummary(summary);
+        
         PostInfo postInfo = new PostInfo(post, 0, 0);
         post.setPostInfo(postInfo);
         postRepository.save(post);
@@ -50,6 +56,7 @@ public class PostService {
                 post.getId(),
                 post.getTitle(),
                 post.getContent(),
+                post.getSummary(),
                 post.getCreatedAt(),
                 post.getUser().getId(),
                 post.getUser().getName(),
@@ -77,6 +84,7 @@ public class PostService {
                     post.getId(),
                     post.getTitle(),
                     post.getContent(),
+                    post.getSummary(),
                     post.getCreatedAt(),
                     post.getUser().getId(),
                     post.getUser().getName(),

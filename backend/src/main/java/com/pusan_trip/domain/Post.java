@@ -25,6 +25,9 @@ public class Post {
     @Column(nullable = false)
     private String content;
 
+    @Column(columnDefinition = "TEXT")
+    private String summary;
+
     @Column(updatable = false)
     @CreationTimestamp
     private LocalDateTime createdAt;
@@ -45,6 +48,10 @@ public class Post {
         this.user = user;
         this.postInfo = postInfo;
         this.comments = Arrays.asList(comments);
+    }
+
+    public void setSummary(String summary) {
+        this.summary = summary;
     }
     
     public void addComment(Comment comment) {
