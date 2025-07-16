@@ -23,6 +23,8 @@ public class PostService {
     private final PostRepository postRepository;
     private final PostInfoRepository postInfoRepository;
     private final UserRepository userRepository;
+    private final CommentRepository commentRepository;
+    private final OpenAIService openAIService;
     private final RegionRepository regionRepository;
 
     @Transactional
@@ -30,13 +32,10 @@ public class PostService {
         // user, region, postinfo 생성 및 저장
         User user = userRepository.findById(requestDto.getUserId())
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
-        Region regionEntity = null;
-        if (requestDto.getRegion() != null && !requestDto.getRegion().isEmpty()) {
-            regionEntity = regionRepository.findByRegion(requestDto.getRegion())
-                .orElseThrow(() -> new IllegalArgumentException("Region not found"));
-        }
-        String summary = "요약본"; // summary 생성 함수로 수정 예정
-        Post post = new Post(requestDto.getTitle(), requestDto.getContent(), summary, user, null, regionEntity);
+        Post post = new Post(requestDto.getTitle(), requestDto.getContent(), user, null);
+        String summary = openAIService.generateSummary(requestDto.getContent());
+        post.setSummary(summary);
+      
         PostInfo postInfo = new PostInfo(post, 0, 0);
         post.setPostInfo(postInfo);
         postRepository.save(post);

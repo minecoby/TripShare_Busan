@@ -25,7 +25,7 @@ public class Post {
     @Column(nullable = false)
     private String content;
 
-    @Column(length = 300)
+    @Column(columnDefinition = "TEXT")
     private String summary;
 
     @Column(updatable = false)
@@ -54,6 +54,10 @@ public class Post {
         this.postInfo = postInfo;
         this.region = region;
         this.comments = Arrays.asList(comments);
+    }
+
+    public void setSummary(String summary) {
+        this.summary = summary;
     }
     
     public void addComment(Comment comment) {
