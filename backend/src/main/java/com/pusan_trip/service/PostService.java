@@ -3,13 +3,14 @@ package com.pusan_trip.service;
 import com.pusan_trip.domain.Post;
 import com.pusan_trip.domain.PostInfo;
 import com.pusan_trip.domain.User;
+import com.pusan_trip.domain.Region;
 import com.pusan_trip.dto.PostRequestDto;
 import com.pusan_trip.dto.PostResponseDto;
 import com.pusan_trip.dto.CommentRequestDto;
 import com.pusan_trip.repository.PostRepository;
 import com.pusan_trip.repository.PostInfoRepository;
 import com.pusan_trip.repository.UserRepository;
-import com.pusan_trip.repository.CommentRepository;
+import com.pusan_trip.repository.RegionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,18 +25,17 @@ public class PostService {
     private final UserRepository userRepository;
     private final CommentRepository commentRepository;
     private final OpenAIService openAIService;
+    private final RegionRepository regionRepository;
 
     @Transactional
     public Long createPost(PostRequestDto requestDto) {
-        // user, postinfo 생성 및 저장
+        // user, region, postinfo 생성 및 저장
         User user = userRepository.findById(requestDto.getUserId())
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
         Post post = new Post(requestDto.getTitle(), requestDto.getContent(), user, null);
-
-
         String summary = openAIService.generateSummary(requestDto.getContent());
         post.setSummary(summary);
-        
+      
         PostInfo postInfo = new PostInfo(post, 0, 0);
         post.setPostInfo(postInfo);
         postRepository.save(post);
@@ -49,9 +49,14 @@ public class PostService {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new IllegalArgumentException("Post not found"));
         PostInfo postInfo = post.getPostInfo();
+        // 조회수 자동 증가
+        if (postInfo != null) {
+            postInfo.increaseSeenCount();
+        }
         List<CommentRequestDto> comments = post.getComments().stream()
                 .map(c -> new CommentRequestDto(c.getId(),  c.getUser().getId(), c.getContent()))
                 .collect(Collectors.toList());
+        String region = post.getRegion() != null ? post.getRegion().getRegion() : null;
         return new PostResponseDto(
                 post.getId(),
                 post.getTitle(),
@@ -63,7 +68,8 @@ public class PostService {
                 postInfo != null ? postInfo.getLikeCount() : 0,
                 postInfo != null ? postInfo.getSeenCount() : 0,
                 comments.size(),
-                comments
+                comments,
+                region
         );
     }
 
@@ -72,6 +78,11 @@ public class PostService {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new IllegalArgumentException("Post not found"));
         post.update(requestDto.getTitle(), requestDto.getContent());
+        if (requestDto.getRegion() != null && !requestDto.getRegion().isEmpty()) {
+            Region regionEntity = regionRepository.findByRegion(requestDto.getRegion())
+                .orElseThrow(() -> new IllegalArgumentException("Region not found"));
+            post.setRegion(regionEntity);
+        }
     }
 
     @Transactional(readOnly = true)
@@ -80,6 +91,7 @@ public class PostService {
         List<Post> posts = postRepository.findAll();
         return posts.stream().map(post -> {
             PostInfo postInfo = post.getPostInfo();
+            String region = post.getRegion() != null ? post.getRegion().getRegion() : null;
             return new PostResponseDto(
                     post.getId(),
                     post.getTitle(),
@@ -91,7 +103,8 @@ public class PostService {
                     postInfo != null ? postInfo.getLikeCount() : 0,
                     postInfo != null ? postInfo.getSeenCount() : 0,
                     post.getComments().size(),
-                    null // 목록에서는 댓글 리스트 제외
+                    null,
+                    region
             );
         }).collect(Collectors.toList());
     }
@@ -102,16 +115,6 @@ public class PostService {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new IllegalArgumentException("Post not found"));
         postRepository.delete(post);
-    }
-
-    @Transactional
-    public void increaseSeenCount(Long postId) {
-        Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new IllegalArgumentException("Post not found"));
-        PostInfo postInfo = post.getPostInfo();
-        if (postInfo != null) {
-            postInfo.increaseSeenCount();
-        }
     }
 
     @Transactional

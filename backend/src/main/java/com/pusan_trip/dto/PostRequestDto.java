@@ -19,4 +19,10 @@ public class PostRequestDto {
 
     @NotNull
     private Long userId;
+
+    private String region;
+
+    public String getRegion() {
+        return region;
+    }
 } 

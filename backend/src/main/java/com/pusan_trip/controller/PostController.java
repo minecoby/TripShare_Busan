@@ -49,13 +49,6 @@ public class PostController {
         return ResponseEntity.ok().build();
     }
 
-    // 조회수 증가
-    @PostMapping("/{postId}/seen")
-    public ResponseEntity<Void> increaseSeenCount(@PathVariable Long postId) {
-        postService.increaseSeenCount(postId);
-        return ResponseEntity.ok().build();
-    }
-
     // 좋아요 증가
     @PostMapping("/{postId}/like")
     public ResponseEntity<Void> increaseLikeCount(@PathVariable Long postId) {

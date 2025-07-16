@@ -5,10 +5,12 @@ import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import java.time.LocalDateTime;
 import java.util.List;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class PostResponseDto {
     private Long id;
     private String title;
@@ -20,5 +22,26 @@ public class PostResponseDto {
     private Integer likeCount;
     private Integer seenCount;
     private Integer commentCount;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private List<CommentRequestDto> comments;
+    private String region;
+
+    public PostResponseDto(Long id, String title, String content, String summary, LocalDateTime createdAt, Long userId, String userName, int likeCount, int seenCount, int commentCount, List<CommentRequestDto> comments, String region) {
+        this.id = id;
+        this.title = title;
+        this.content = content;
+        this.summary = summary;
+        this.createdAt = createdAt;
+        this.userId = userId;
+        this.userName = userName;
+        this.likeCount = likeCount;
+        this.seenCount = seenCount;
+        this.commentCount = commentCount;
+        this.comments = comments;
+        this.region = region;
+    }
+
+    public String getRegion() {
+        return region;
+    }
 } 
