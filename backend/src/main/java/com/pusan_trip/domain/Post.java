@@ -46,6 +46,9 @@ public class Post {
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments = new ArrayList<>();
 
+    @OneToOne(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Route route;
+
     public Post(String title, String content, String summary, User user, PostInfo postInfo, Region region, Comment... comments) {
         this.title = title;
         this.content = content;
@@ -79,5 +82,9 @@ public class Post {
 
     public void setRegion(Region region) {
         this.region = region;
+    }
+
+    public void setRoute(Route route) {
+        this.route = route;
     }
 }

@@ -11,6 +11,8 @@ import com.pusan_trip.repository.PostRepository;
 import com.pusan_trip.repository.PostInfoRepository;
 import com.pusan_trip.repository.UserRepository;
 import com.pusan_trip.repository.RegionRepository;
+import com.pusan_trip.domain.Route;
+import com.pusan_trip.domain.RouteLocation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -54,6 +56,20 @@ public class PostService {
         post.setPostInfo(postInfo);
         postRepository.save(post);
         postInfoRepository.save(postInfo);
+        
+        // 루트 생성 (기본 루트)
+        Route route = new Route(post);
+        post.setRoute(route);
+        
+        // 기본 지역 3개 추가
+        RouteLocation location1 = new RouteLocation("기본 지역 1", "기본 주소 1", null, 1);
+        RouteLocation location2 = new RouteLocation("기본 지역 2", "기본 주소 2", null, 2);
+        RouteLocation location3 = new RouteLocation("기본 지역 3", "기본 주소 3", null, 3);
+        
+        route.addRouteLocation(location1);
+        route.addRouteLocation(location2);
+        route.addRouteLocation(location3);
+        
         return post.getId();
     }
 
