@@ -123,7 +123,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
                 ),
                 child: ClipRRect(
                   child: Image.asset(
-                    'lib/images/oyaji.jpg',
+                    'images/oyaji.jpg',
                     width: 150,
                     height: 150,
                     fit: BoxFit.cover,

@@ -42,15 +42,15 @@ class MylikedPostsPage extends StatelessWidget {
             ),
           ),
           const Divider(height: 1, thickness: 0.5, color: Color(0xFFF4EBEB)),
-          Expanded(
-            child: ListView.builder(
-              padding: const EdgeInsets.symmetric(horizontal: 34, vertical: 6),
-              itemCount: 4,
-              itemBuilder: (context, index) {
-                return PostCard(onTap: () {});
-              },
-            ),
-          ),
+          // Expanded(
+          //   child: ListView.builder(
+          //     padding: const EdgeInsets.symmetric(horizontal: 34, vertical: 6),
+          //     itemCount: 4,
+          //     itemBuilder: (context, index) {
+          //       return PostCard(onTap: () {});
+          //     },
+          //   ),
+          // ),
         ],
       ),
     );
