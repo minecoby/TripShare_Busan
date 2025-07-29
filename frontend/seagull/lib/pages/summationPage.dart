@@ -23,7 +23,7 @@ class SummationPage extends StatelessWidget {
                         bottomRight: Radius.circular(20),
                       ),
                       image: const DecorationImage(
-                        image: AssetImage('lib/images/sea.jpg'),
+                        image: AssetImage('images/sea.jpg'),
                         fit: BoxFit.cover,
                       ),
                       boxShadow: [

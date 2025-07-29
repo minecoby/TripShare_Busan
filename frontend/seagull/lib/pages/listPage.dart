@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:seagull/components/showmodal.dart';
-import 'package:seagull/constants/colors.dart';
 import 'package:seagull/components/postcard.dart';
+import 'package:seagull/constants/colors.dart';
+import 'package:seagull/controller/post_controller.dart';
+import 'package:seagull/model/post_model.dart';
 import 'package:get/get.dart';
+import 'package:seagull/components/showmodal.dart';
 
 class ListPageView extends StatefulWidget {
   const ListPageView({super.key});
@@ -13,20 +15,8 @@ class ListPageView extends StatefulWidget {
 
 class _ListPageViewState extends State<ListPageView> {
   late ScrollController _scrollController;
-
-  @override
-  void initState() {
-    super.initState();
-    _scrollController = ScrollController();
-  }
-
-  @override
-  void dispose() {
-    _scrollController.dispose();
-    super.dispose();
-  }
-
   final List<String> _districts = [
+    "전체",
     "중구",
     "동구",
     "영도구",
@@ -44,8 +34,59 @@ class _ListPageViewState extends State<ListPageView> {
     "기장군",
     "서구",
   ];
+  String _selected = "전체";
 
-  String _selected = "중구";
+  List<Post> _posts = [];
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController = ScrollController();
+    _fetchPosts();
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _fetchPosts() async {
+    try {
+      final controller = PostController();
+      final posts = await controller.fetchPosts();
+
+      posts.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+
+      setState(() {
+        _posts = posts;
+        _isLoading = false;
+      });
+    } catch (e) {
+      print('게시글 로딩 실패: $e');
+    }
+  }
+
+  List<Post> get filteredPosts {
+    if (_selected == "전체") return _posts;
+    return _posts.where((post) => post.region == _selected).toList();
+  }
+
+  void _scrollToSelectedDistrict(String name) {
+    final index = _districts.indexOf(name);
+    if (index == -1) return;
+
+    const itemWidth = 90.0;
+    final screenCenter = MediaQuery.of(context).size.width / 2;
+    final scrollOffset = index * itemWidth - screenCenter + itemWidth / 2;
+
+    _scrollController.animateTo(
+      scrollOffset.clamp(0, _scrollController.position.maxScrollExtent),
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeOut,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -55,7 +96,6 @@ class _ListPageViewState extends State<ListPageView> {
         children: [
           Stack(
             children: [
-              // 파란색 컨테이너 웨이브 모양양
               ClipPath(
                 clipper: HJCustomClipper(),
                 child: Container(
@@ -64,10 +104,9 @@ class _ListPageViewState extends State<ListPageView> {
                   width: double.infinity,
                 ),
               ),
-              // 검색 아이콘콘
               Positioned(
-                top: 255 - 65 - 24, // 전체 높이 - r - icon의 길이 절반
-                right: 65 - 24, // r - icon 길이 절반
+                top: 255 - 65 - 24,
+                right: 65 - 24,
                 child: Container(
                   width: 50,
                   height: 50,
@@ -82,7 +121,6 @@ class _ListPageViewState extends State<ListPageView> {
                   ),
                 ),
               ),
-              // 상단 목록 + 작성 아이콘콘
               Positioned(
                 top: 10,
                 left: 0,
@@ -105,15 +143,14 @@ class _ListPageViewState extends State<ListPageView> {
                             barrierColor: Colors.black.withOpacity(0.3),
                             builder: (BuildContext context) {
                               return Dialog(
-                                backgroundColor: Color(
+                                backgroundColor: const Color(
                                   0xFF696666,
-                                ).withOpacity(0.8), // 투명 배경
-                                insetPadding: EdgeInsets.zero, // 전체화면처럼
+                                ).withOpacity(0.8),
+                                insetPadding: EdgeInsets.zero,
                                 child: ShowModal(
                                   districts: _districts,
                                   onSelect: (selected) {
                                     setState(() => _selected = selected);
-
                                     WidgetsBinding.instance
                                         .addPostFrameCallback((_) {
                                           _scrollToSelectedDistrict(selected);
@@ -125,11 +162,15 @@ class _ListPageViewState extends State<ListPageView> {
                           );
                         },
                       ),
-                      const Icon(
+                      GestureDetector(
+                        onTap : () {
+                          Get.toNamed("/write");
+                        },
+                        child: const Icon(
                         Icons.add_rounded,
                         color: Colors.white,
                         size: 33,
-                      ),
+                      ),)
                     ],
                   ),
                 ),
@@ -149,7 +190,14 @@ class _ListPageViewState extends State<ListPageView> {
                       final name = _districts[idx];
                       final selected = name == _selected;
                       return GestureDetector(
-                        onTap: () => setState(() => _selected = name),
+                        onTap: () {
+                          setState(() {
+                            _selected = name;
+                            _isLoading = true;
+                          });
+                          _fetchPosts();
+                        },
+
                         child: Container(
                           padding: const EdgeInsets.symmetric(
                             horizontal: 20,
@@ -183,35 +231,32 @@ class _ListPageViewState extends State<ListPageView> {
               offset: const Offset(0, -25),
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: ListView.builder(
-                  itemCount: 10,
-                  itemBuilder:
-                      (context, index) => PostCard(
-                        onTap: () {
-                          Get.toNamed('/summation'); // 👈 여기만 바꾸면 됨!
-                        },
-                      ),
-                ),
+                child:
+                    _isLoading
+                        ? const Center(child: CircularProgressIndicator())
+                        : ListView.builder(
+                          itemCount: filteredPosts.length,
+                          itemBuilder: (context, index) {
+                            final post = filteredPosts[index];
+                            return PostCard(
+                              onTap:
+                                  () => Get.toNamed(
+                                    '/summation',
+                                    arguments: post.id,
+                                  ),
+                              title: post.title,
+                              nickname: post.userName,
+                              region: post.region,
+                              likeCount: post.likeCount,
+                              commentCount: post.commentCount,
+                            );
+                          },
+                        ),
               ),
             ),
           ),
         ],
       ),
-    );
-  }
-
-  void _scrollToSelectedDistrict(String name) {
-    final index = _districts.indexOf(name);
-    if (index == -1) return;
-
-    const itemWidth = 90.0;
-    final screenCenter = MediaQuery.of(context).size.width / 2;
-    final scrollOffset = index * itemWidth - screenCenter + itemWidth / 2;
-
-    _scrollController.animateTo(
-      scrollOffset.clamp(0, _scrollController.position.maxScrollExtent),
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeOut,
     );
   }
 }

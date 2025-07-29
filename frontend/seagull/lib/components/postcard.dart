@@ -4,7 +4,21 @@ import 'package:seagull/constants/colors.dart';
 class PostCard extends StatelessWidget {
   final VoidCallback? onTap;
 
-  const PostCard({this.onTap, super.key});
+  final String title;
+  final String nickname;
+  final int likeCount;
+  final int commentCount;
+  final String region;
+
+  const PostCard({
+    required this.title,
+    required this.nickname,
+    required this.likeCount,
+    required this.commentCount,
+    required this.region,
+    this.onTap,
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +41,7 @@ class PostCard extends StatelessWidget {
                 child: SizedBox(
                   width: 65,
                   height: 65,
-                  child: Image.asset('lib/images/oyaji.jpg', fit: BoxFit.cover),
+                  child: Image.asset('images/oyaji.jpg', fit: BoxFit.cover),
                 ),
               ),
               const SizedBox(width: 10),
@@ -36,9 +50,9 @@ class PostCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text(
-                      '북구 화명동에 떠나보았습니다',
-                      style: TextStyle(
+                    Text(
+                      title,
+                      style: const TextStyle(
                         fontWeight: FontWeight.w600,
                         fontSize: 15,
                         color: TextColor,
@@ -47,20 +61,24 @@ class PostCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 8),
                     Row(
-                      children: const [
-                        UserDataText('user'),
-                        UserDataText(' | '),
-                        Icon(
+                      children: [
+                        UserDataText(nickname),
+                        const UserDataText(' | '),
+                        const Icon(
                           Icons.favorite_border,
                           size: 14,
                           color: Color(0xFF8A8A8A),
                         ),
-                        SizedBox(width: 4),
-                        UserDataText('0'),
-                        UserDataText(' | '),
-                        Icon(Icons.comment, size: 14, color: Color(0xFF8A8A8A)),
-                        SizedBox(width: 4),
-                        UserDataText('0'),
+                        const SizedBox(width: 4),
+                        UserDataText(likeCount.toString()),
+                        const UserDataText(' | '),
+                        const Icon(
+                          Icons.comment,
+                          size: 14,
+                          color: Color(0xFF8A8A8A),
+                        ),
+                        const SizedBox(width: 4),
+                        UserDataText(commentCount.toString()),
                       ],
                     ),
                   ],
@@ -70,7 +88,7 @@ class PostCard extends StatelessWidget {
                 width: 25,
                 height: 25,
                 decoration: const BoxDecoration(
-                  color: Color(0xFFCEC8FD), //연보라로맞췄어
+                  color: Color(0xFFCEC8FD), // 연보라
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(

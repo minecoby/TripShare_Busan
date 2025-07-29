@@ -2,6 +2,9 @@ import 'package:get/get.dart';
 
 import 'package:seagull/layout/navigationLayout.dart';
 import 'package:seagull/layout/noLayout.dart';
+import 'package:seagull/pages/MakePage/mapPage.dart';
+import 'package:seagull/pages/MakePage/rootPage.dart';
+import 'package:seagull/pages/MakePage/writePage.dart';
 
 import 'package:seagull/pages/mainPage.dart';
 import 'package:seagull/pages/listPage.dart';
@@ -28,5 +31,8 @@ class MainRouter {
       name: '/liked',
       page: () => NavigationLayout(child: MylikedPostsPage()),
     ),
+    GetPage(name: '/write', page: () => NoLayout(child: WritePage())),
+    GetPage(name: '/root', page: () => NoLayout(child: RootPage())),
+    GetPage(name: '/map', page: () => NoLayout(child: MapPage())),
   ];
 }

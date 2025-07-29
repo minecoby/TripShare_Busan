@@ -8,3 +8,7 @@ class BaseUrl {
 class Urls {
   static final String apiUrl = '${BaseUrl.baseUrl}/';
 }
+
+class AppKey {
+  static final String appKey = dotenv.env['APP_KEY'] ?? '';
+}
