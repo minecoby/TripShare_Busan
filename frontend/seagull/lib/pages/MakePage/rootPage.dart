@@ -69,8 +69,10 @@ class _RootPageState extends State<RootPage> {
                         ],
                       ),
                       Row(
-                        children: const [
-                          Icon(Icons.close, color: Colors.white, size: 18),
+                        children: [
+                          GestureDetector(
+                            onTap: (){Get.offAllNamed("/list");},
+                            child: Icon(Icons.close, color: Colors.white, size: 18),),
                           SizedBox(width: 8),
                           Icon(Icons.check, color: Colors.white, size: 18),
                         ],
@@ -100,7 +102,7 @@ class _RootPageState extends State<RootPage> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     GestureDetector(
-                      onTap: (){Get.toNamed("/map");},
+                      onTap: (){Get.toNamed("/write");},
                       child: Icon(
                       Icons.keyboard_double_arrow_left_outlined,
                       color: Colors.white,
