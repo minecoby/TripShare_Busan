@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:seagull/constants/colors.dart';
+import 'package:get/get.dart';
 
 class WritePage extends StatelessWidget {
   const WritePage({super.key});
@@ -25,7 +26,7 @@ class WritePage extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Row(
-                        children: const [
+                        children: [
                           Icon(
                             Icons.edit_square,
                             color: Colors.white,
@@ -41,15 +42,25 @@ class WritePage extends StatelessWidget {
                             color: Colors.white,
                             size: 16,
                           ),
-                          Text(
-                            '코스 설정',
-                            style: TextStyle(color: Colors.white, fontSize: 14),
+                          GestureDetector(
+                            onTap: () {
+                              Get.toNamed("/root");
+                            },
+                            child: Text(
+                              '코스 설정',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 14,
+                              ),
+                            ),
                           ),
                         ],
                       ),
                       Row(
-                        children: const [
-                          Icon(Icons.close, color: Colors.white, size: 18),
+                        children: [
+                          GestureDetector(
+                            onTap: (){Get.offAllNamed("/list");},
+                            child: Icon(Icons.close, color: Colors.white, size: 18),),
                           SizedBox(width: 8),
                           Icon(Icons.check, color: Colors.white, size: 18),
                         ],
@@ -78,11 +89,13 @@ class WritePage extends StatelessWidget {
                 SizedBox(height: 10),
                 Align(
                   alignment: Alignment.bottomRight,
-                  child: Icon(
+                  child: GestureDetector(
+                    onTap: (){Get.toNamed("/root");},
+                    child : Icon(
                     Icons.keyboard_double_arrow_right_outlined,
                     color: Colors.white,
                     size: 30,
-                  ),
+                  ),)
                 ),
               ],
             ),
