@@ -25,8 +25,9 @@ public class PostResponseDto {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private List<CommentRequestDto> comments;
     private String region;
+    private Long routeId;
 
-    public PostResponseDto(Long id, String title, String content, String summary, LocalDateTime createdAt, Long userId, String userName, int likeCount, int seenCount, int commentCount, List<CommentRequestDto> comments, String region) {
+    public PostResponseDto(Long id, String title, String content, String summary, LocalDateTime createdAt, Long userId, String userName, int likeCount, int seenCount, int commentCount, List<CommentRequestDto> comments, String region, Long routeId) {
         this.id = id;
         this.title = title;
         this.content = content;
@@ -39,6 +40,7 @@ public class PostResponseDto {
         this.commentCount = commentCount;
         this.comments = comments;
         this.region = region;
+        this.routeId = routeId;
     }
 
     public String getRegion() {

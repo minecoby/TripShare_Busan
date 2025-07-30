@@ -99,7 +99,8 @@ public class PostService {
                 postInfo != null ? postInfo.getSeenCount() : 0,
                 comments.size(),
                 comments,
-                region
+                region,
+                post.getRoute() != null ? post.getRoute().getId() : null
         );
     }
 
@@ -134,7 +135,8 @@ public class PostService {
                     postInfo != null ? postInfo.getSeenCount() : 0,
                     post.getComments().size(),
                     null,
-                    region
+                    region,
+                    post.getRoute() != null ? post.getRoute().getId() : null
             );
         }).collect(Collectors.toList());
     }
