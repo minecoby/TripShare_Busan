@@ -39,7 +39,7 @@ public class CommentService {
         return new CommentResponseDto(
                 comment.getId(),
                 comment.getPost().getId(),
-                comment.getUser().getId(),
+                comment.getUser().getUserId(),
                 comment.getUser().getName(),
                 comment.getUser().getProfileImage(),
                 comment.getContent(),
