@@ -24,6 +24,8 @@ public class SignupRequestDto {
     @Email(message = "이메일 형식이 아닙니다.")
     private String email;
 
+    private String profileImage; // 프로필 사진 URL (선택사항)
+
     protected SignupRequestDto() {}
 
     public SignupRequestDto(String userId, String password, String name, String email) {
@@ -31,5 +33,6 @@ public class SignupRequestDto {
         this.password = password;
         this.name = name;
         this.email = email;
+        this.profileImage = null; // 회원가입 시에는 프로필 사진을 비워둠
     }
 }

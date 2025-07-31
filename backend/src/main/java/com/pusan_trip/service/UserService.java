@@ -10,6 +10,7 @@ import com.pusan_trip.exception.DuplicateUserException;
 
 import com.pusan_trip.dto.NicknameRequest;
 import com.pusan_trip.dto.PasswordChangeRequest;
+import com.pusan_trip.dto.MyPageResponseDto;
 
 import com.pusan_trip.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -56,6 +57,11 @@ public class UserService {
                 dto.getName(),
                 dto.getEmail()
         );
+        
+        // 프로필 사진이 제공된 경우 설정
+        if (dto.getProfileImage() != null && !dto.getProfileImage().trim().isEmpty()) {
+            user.updateProfileImage(dto.getProfileImage());
+        }
 
         userRepository.save(user);
 
@@ -110,5 +116,30 @@ public class UserService {
         // 새 비밀번호 암호화 및 업데이트
         String encodedNewPassword = passwordEncoder.encode(request.getNewPassword());
         user.updatePassword(encodedNewPassword);
+    }
+
+    @Transactional
+    public void updateProfileImage(Long userId, String profileImage) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+        
+        if (profileImage == null || profileImage.trim().isEmpty()) {
+            throw new IllegalArgumentException("프로필 사진 URL은 비어있을 수 없습니다.");
+        }
+        
+        user.updateProfileImage(profileImage);
+    }
+
+    @Transactional(readOnly = true)
+    public MyPageResponseDto getMyPage(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+        
+        return new MyPageResponseDto(
+                user.getId(),
+                user.getUserId(),
+                user.getName(),
+                user.getProfileImage()
+        );
     }
 }

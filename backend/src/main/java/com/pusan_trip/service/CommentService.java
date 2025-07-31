@@ -23,7 +23,7 @@ public class CommentService {
     public CommentResponseDto createComment(CommentRequestDto requestDto) {
         Post post = postRepository.findById(requestDto.getPostId())
                 .orElseThrow(() -> new IllegalArgumentException("Post not found"));
-        User user = userRepository.findById(requestDto.getUserId())
+        User user = userRepository.findByUserId(requestDto.getUserId())
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
         Comment comment = new Comment(post, user, requestDto.getContent());
         commentRepository.save(comment);
@@ -41,6 +41,7 @@ public class CommentService {
                 comment.getPost().getId(),
                 comment.getUser().getId(),
                 comment.getUser().getName(),
+                comment.getUser().getProfileImage(),
                 comment.getContent(),
                 comment.getCreatedAt()
         );

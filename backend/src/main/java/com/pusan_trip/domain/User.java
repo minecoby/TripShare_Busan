@@ -26,6 +26,8 @@ public class User {
     @Column(unique = true, nullable = false) // 중복, null 허용 안함
     private String email;
 
+    private String profileImage; // 프로필 사진 URL
+
 
     // 게시글 연관 관계 - 유저가 작성한 게시글 목록을 조회할 때 필요
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -36,6 +38,7 @@ public class User {
         this.password = password;
         this.name = name;
         this.email = email;
+        this.profileImage = null; // 기본값은 null
     }
 
     // 닉네임 변경 메서드
@@ -46,5 +49,10 @@ public class User {
     // 비밀번호 변경 메서드 (비밀번호 확인은 서비스 레이어에서 처리)
     public void updatePassword(String newPassword) {
         this.password = newPassword;
+    }
+
+    // 프로필 사진 변경 메서드
+    public void updateProfileImage(String profileImage) {
+        this.profileImage = profileImage;
     }
 }

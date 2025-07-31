@@ -4,6 +4,7 @@ import com.pusan_trip.domain.Post;
 import com.pusan_trip.domain.PostInfo;
 import com.pusan_trip.domain.User;
 import com.pusan_trip.domain.Region;
+import com.pusan_trip.dto.CommentResponseDto;
 import com.pusan_trip.dto.PostRequestDto;
 import com.pusan_trip.dto.PostResponseDto;
 import com.pusan_trip.dto.CommentRequestDto;
@@ -83,8 +84,16 @@ public class PostService {
         if (postInfo != null) {
             postInfo.increaseSeenCount();
         }
-        List<CommentRequestDto> comments = post.getComments().stream()
-                .map(c -> new CommentRequestDto(c.getId(),  c.getUser().getId(), c.getContent()))
+        List<CommentResponseDto> comments = post.getComments().stream()
+                .map(c -> new CommentResponseDto(
+                        c.getId(),
+                        c.getPost().getId(),
+                        c.getUser().getUserId(),
+                        c.getUser().getName(),
+                        c.getUser().getProfileImage(),
+                        c.getContent(),
+                        c.getCreatedAt()
+                ))
                 .collect(Collectors.toList());
         String region = post.getRegion() != null ? post.getRegion().getRegion() : null;
         return new PostResponseDto(
@@ -95,6 +104,7 @@ public class PostService {
                 post.getCreatedAt(),
                 post.getUser().getId(),
                 post.getUser().getName(),
+                post.getUser().getProfileImage(),
                 postInfo != null ? postInfo.getLikeCount() : 0,
                 postInfo != null ? postInfo.getSeenCount() : 0,
                 comments.size(),
@@ -131,6 +141,7 @@ public class PostService {
                     post.getCreatedAt(),
                     post.getUser().getId(),
                     post.getUser().getName(),
+                    post.getUser().getProfileImage(),
                     postInfo != null ? postInfo.getLikeCount() : 0,
                     postInfo != null ? postInfo.getSeenCount() : 0,
                     post.getComments().size(),

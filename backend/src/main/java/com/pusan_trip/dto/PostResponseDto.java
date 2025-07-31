@@ -19,15 +19,16 @@ public class PostResponseDto {
     private LocalDateTime createdAt;
     private Long userId;
     private String userName;
+    private String imageUrl;
     private Integer likeCount;
     private Integer seenCount;
     private Integer commentCount;
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private List<CommentRequestDto> comments;
+    private List<CommentResponseDto> comments;
     private String region;
     private Long routeId;
 
-    public PostResponseDto(Long id, String title, String content, String summary, LocalDateTime createdAt, Long userId, String userName, int likeCount, int seenCount, int commentCount, List<CommentRequestDto> comments, String region, Long routeId) {
+    public PostResponseDto(Long id, String title, String content, String summary, LocalDateTime createdAt, Long userId, String userName, String imageUrl, int likeCount, int seenCount, int commentCount, List<CommentResponseDto> comments, String region, Long routeId) {
         this.id = id;
         this.title = title;
         this.content = content;
@@ -35,6 +36,7 @@ public class PostResponseDto {
         this.createdAt = createdAt;
         this.userId = userId;
         this.userName = userName;
+        this.imageUrl = imageUrl;
         this.likeCount = likeCount;
         this.seenCount = seenCount;
         this.commentCount = commentCount;
