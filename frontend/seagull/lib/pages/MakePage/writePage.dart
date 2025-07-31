@@ -1,9 +1,84 @@
 import 'package:flutter/material.dart';
 import 'package:seagull/constants/colors.dart';
 import 'package:get/get.dart';
+import 'dart:io';
+import 'package:image_picker/image_picker.dart';
 
-class WritePage extends StatelessWidget {
+class WritePage extends StatefulWidget {
   const WritePage({super.key});
+
+  @override
+  State<WritePage> createState() => _WritePageState();
+}
+
+class _WritePageState extends State<WritePage> {
+  final ImagePicker _picker = ImagePicker();
+
+  List<Map<String, dynamic>> contents = [
+    {"type": "text", "controller": TextEditingController()},
+  ];
+
+  Future<void> _pickImages(int insertIndex) async {
+    final List<XFile> pickedFiles = await _picker.pickMultiImage();
+    if (pickedFiles.isNotEmpty) {
+      for (var picked in pickedFiles) {
+        contents.insert(insertIndex + 1, {
+          "type": "image",
+          "file": File(picked.path),
+          "alignment": Alignment.center,
+        });
+        contents.insert(insertIndex + 2, {
+          "type": "text",
+          "controller": TextEditingController(),
+        });
+        insertIndex += 2;
+      }
+      setState(() {});
+    }
+  }
+
+  void _removeItem(int index) {
+    setState(() => contents.removeAt(index));
+  }
+
+  void _changeAlignment(int index, Alignment alignment) {
+    setState(() {
+      contents[index]["alignment"] = alignment;
+    });
+  }
+
+  Widget _buildImageWidget(Map<String, dynamic> item, int index) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Align(
+          alignment: item["alignment"],
+          child: Image.file(item["file"], width: 250),
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            IconButton(
+              icon: Icon(Icons.format_align_left),
+              onPressed: () => _changeAlignment(index, Alignment.centerLeft),
+            ),
+            IconButton(
+              icon: Icon(Icons.format_align_center),
+              onPressed: () => _changeAlignment(index, Alignment.center),
+            ),
+            IconButton(
+              icon: Icon(Icons.format_align_right),
+              onPressed: () => _changeAlignment(index, Alignment.centerRight),
+            ),
+            IconButton(
+              icon: Icon(Icons.delete),
+              onPressed: () => _removeItem(index),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -12,41 +87,35 @@ class WritePage extends StatelessWidget {
       body: Stack(
         children: [
           Padding(
-            padding: const EdgeInsets.only(
-              top: 40,
-              bottom: 0,
-              left: 15,
-              right: 15,
-            ),
+            padding: const EdgeInsets.only(top: 40, left: 15, right: 15),
             child: Column(
               children: [
+                //상단바
                 Padding(
-                  padding: EdgeInsetsGeometry.only(left: 14, right: 5),
+                  padding: const EdgeInsets.only(left: 14, right: 5),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Row(
                         children: [
-                          Icon(
+                          const Icon(
                             Icons.edit_square,
                             color: Colors.white,
                             size: 16,
                           ),
-                          Text(
+                          const Text(
                             ' 메인글작성',
                             style: TextStyle(color: Colors.white, fontSize: 14),
                           ),
-                          SizedBox(width: 15),
-                          Icon(
+                          const SizedBox(width: 15),
+                          const Icon(
                             Icons.location_on,
                             color: Colors.white,
                             size: 16,
                           ),
                           GestureDetector(
-                            onTap: () {
-                              Get.toNamed("/root");
-                            },
-                            child: Text(
+                            onTap: () => Get.toNamed("/root"),
+                            child: const Text(
                               '코스 설정',
                               style: TextStyle(
                                 color: Colors.white,
@@ -59,10 +128,19 @@ class WritePage extends StatelessWidget {
                       Row(
                         children: [
                           GestureDetector(
-                            onTap: (){Get.offAllNamed("/list");},
-                            child: Icon(Icons.close, color: Colors.white, size: 18),),
-                          SizedBox(width: 8),
-                          Icon(Icons.check, color: Colors.white, size: 18),
+                            onTap: () => Get.offAllNamed("/list"),
+                            child: const Icon(
+                              Icons.close,
+                              color: Colors.white,
+                              size: 18,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          const Icon(
+                            Icons.check,
+                            color: Colors.white,
+                            size: 18,
+                          ),
                         ],
                       ),
                     ],
@@ -80,45 +158,31 @@ class WritePage extends StatelessWidget {
                       vertical: 20,
                     ),
                     decoration: BoxDecoration(
-                      color: Color(0xFFD8D8D8),
+                      color: const Color(0xFFD8D8D8),
                       borderRadius: BorderRadius.circular(24),
-                      border: Border.all(color: Color(0xFF757575), width: 1),
+                      border: Border.all(
+                        color: const Color(0xFF757575),
+                        width: 1,
+                      ),
                     ),
                   ),
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 Align(
                   alignment: Alignment.bottomRight,
                   child: GestureDetector(
-                    onTap: (){Get.toNamed("/root");},
-                    child : Icon(
-                    Icons.keyboard_double_arrow_right_outlined,
-                    color: Colors.white,
-                    size: 30,
-                  ),)
+                    onTap: () => Get.toNamed("/root"),
+                    child: const Icon(
+                      Icons.keyboard_double_arrow_right_outlined,
+                      color: Colors.white,
+                      size: 30,
+                    ),
+                  ),
                 ),
               ],
             ),
           ),
 
-          // 하단 좌측: 이미지 추가 버튼
-          Positioned(
-            left: 16,
-            bottom: 16,
-            child: Container(
-              width: 45,
-              height: 45,
-              decoration: BoxDecoration(
-                color: Color(0xFFDDE2EF),
-                borderRadius: BorderRadius.circular(5),
-              ),
-              child: Icon(
-                Icons.add_photo_alternate_outlined,
-                color: Colors.white,
-                size: 30,
-              ),
-            ),
-          ),
           Positioned(
             left: 15,
             right: 15,
@@ -130,41 +194,56 @@ class WritePage extends StatelessWidget {
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(24),
-                border: Border.all(color: Color(0xFF757575), width: 1),
+                border: Border.all(color: const Color(0xFF757575), width: 1),
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const TextField(
-                    decoration: InputDecoration(
-                      hintText: '제목',
-                      border: InputBorder.none,
-                      contentPadding: EdgeInsets.only(left: 15),
-                      isCollapsed: true,
+              child: ListView.builder(
+                itemCount: contents.length,
+                itemBuilder: (context, index) {
+                  final item = contents[index];
+                  if (item["type"] == "text") {
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        TextField(
+                          controller: item["controller"],
+                          maxLines: null,
+                          decoration: const InputDecoration(
+                            hintText: '내용을 입력하세요',
+                            border: InputBorder.none,
+                            contentPadding: EdgeInsets.only(left: 15),
+                            isCollapsed: true,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                      ],
+                    );
+                  } else if (item["type"] == "image") {
+                    return _buildImageWidget(item, index);
+                  } else {
+                    return const SizedBox.shrink();
+                  }
+                },
+              ),
+            ),
+          ),
 
-                      hintStyle: TextStyle(
-                        color: Color(0xFFF4EBEB),
-                        fontSize: 20,
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 8),
-                  Divider(height: 1, color: Color(0xFFE4E4E4)),
-                  SizedBox(height: 15),
-                  TextField(
-                    maxLines: null,
-                    decoration: InputDecoration(
-                      hintText: '추천하고 싶은 코스를 글로 남겨보세요!',
-                      border: InputBorder.none,
-                      contentPadding: EdgeInsets.only(left: 15),
-                      isCollapsed: true,
-                      hintStyle: TextStyle(
-                        color: Color(0xFFE4E4E4),
-                        fontSize: 15,
-                      ),
-                    ),
-                  ),
-                ],
+          Positioned(
+            left: 16,
+            bottom: 16,
+            child: GestureDetector(
+              onTap: () => _pickImages(contents.length - 1),
+              child: Container(
+                width: 45,
+                height: 45,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFDDE2EF),
+                  borderRadius: BorderRadius.circular(5),
+                ),
+                child: const Icon(
+                  Icons.add_photo_alternate_outlined,
+                  color: Colors.white,
+                  size: 30,
+                ),
               ),
             ),
           ),
