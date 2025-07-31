@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:seagull/components/LoginSignupInput.dart';
 import 'package:seagull/constants/colors.dart';
-import 'package:seagull/controller/LoginAndSignup/login_controller.dart';
+import 'package:seagull/api/controller/LoginAndSignup/login_controller.dart';
 
 class LoginPage extends StatelessWidget {
   const LoginPage({super.key});

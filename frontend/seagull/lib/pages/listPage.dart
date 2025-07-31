@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:seagull/components/postcard.dart';
 import 'package:seagull/constants/colors.dart';
-import 'package:seagull/controller/post_controller.dart';
-import 'package:seagull/model/post_model.dart';
+import 'package:seagull/api/controller/post_controller.dart';
+import 'package:seagull/api/model/post_model.dart';
 import 'package:get/get.dart';
 import 'package:seagull/components/showmodal.dart';
 

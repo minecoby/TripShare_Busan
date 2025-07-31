@@ -1,12 +1,99 @@
 import 'package:flutter/material.dart';
+import 'package:seagull/api/controller/PostPage/post_route_controller.dart';
+import 'package:seagull/api/controller/PostPage/post_summary_controller.dart';
 import 'package:seagull/constants/colors.dart';
 import 'package:seagull/pages/detailPage.dart';
+import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class SummationPage extends StatelessWidget {
+class SummationPage extends StatefulWidget {
   const SummationPage({super.key});
 
   @override
+  State<SummationPage> createState() => _SummationPageState();
+}
+
+class _SummationPageState extends State<SummationPage> {
+  final PostSummaryController _postSummaryController = Get.put(
+    PostSummaryController(),
+  );
+  int postId = 0;
+
+  // final RouteController _routeController = Get.put(RouteController());
+
+  String errormessage = '';
+
+  @override
+  void initState() {
+    super.initState();
+    postId = Get.arguments as int;
+    _loadPost();
+  }
+
+  Future<void> _loadPost() async {
+    await _postSummaryController.fetchPost(postId);
+
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('access_token');
+
+    // if (token != null && _postSummaryController.post?.routeId != null) {
+    //   try {
+    //     await _routeController.fetchRoute(_postSummaryController.post!.routeId!);
+    //   } catch (e) {
+    //     errormessage = "루트 정보 불러오기를 실패하였습니다";
+    //   }
+    // } else {
+    //   errormessage = "🔒 루트 정보는 로그인 후 확인할 수 있습니다.\n로그인 후 다시 확인해주세요!";
+    // }
+
+    setState(() {});
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final post = _postSummaryController.post;
+    // final route = _routeController.route;
+
+    if (post == null) {
+      return Scaffold(
+        body: Stack(
+          children: [
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Icon(Icons.face_2, size: 50, color: MainColor),
+                Text(
+                  "게시글을 찾을 수 없습니다\n다시시도해주세요",
+                  style: TextStyle(fontSize: 14, color: SubTextColor),
+                ),
+              ],
+            ),
+            Positioned(
+              top: 15,
+              left: 15,
+              child: GestureDetector(
+                onTap: () => Navigator.pop(context),
+                child: Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: const Icon(
+                    Icons.undo_rounded,
+                    color: Color(0xFF757575),
+                    size: 24,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
     return Scaffold(
       body: Stack(
         children: [
@@ -64,7 +151,9 @@ class SummationPage extends StatelessWidget {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Expanded(child: PageUserData('광안리로 떠나다', '김효정')),
+                        Expanded(
+                          child: PageUserData(post.title, post.userName),
+                        ),
                         SizedBox(width: 10),
                         LikeCount(0),
                       ],
@@ -77,9 +166,8 @@ class SummationPage extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      '화명동은 부산 북구에 위치한 주거 중심지로, 금정산과 낙동강 사이에 자리 잡아 자연과 도시가 조화를 이루는 지역입니다. '
-                      '2000년대 화명 신시가지 개발로 대규모 아파트 단지가 조성되며 인구가 급증하였고, 현재는 화명 1·2·3동으로 나뉘어 있습니다.',
+                    Text(
+                      post.summary,
                       style: TextStyle(
                         color: TextColor,
                         fontSize: 14,
@@ -95,23 +183,41 @@ class SummationPage extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 8),
-                    SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: Row(
-                        children: List.generate(
-                          5,
-                          (index) => Container(
-                            height: 130,
-                            width: 215,
-                            margin: EdgeInsets.only(right: index == 4 ? 0 : 15),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFD9D9D9),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
+                    // route != null
+                    //     ? SingleChildScrollView(
+                    //   scrollDirection: Axis.horizontal,
+                    //   child: Row(
+                    //     children: route.locations
+                    //         .map((loc) => Container(
+                    //       height: 130,
+                    //       width: 215,
+                    //       margin: const EdgeInsets.only(right: 15),
+                    //       decoration: BoxDecoration(
+                    //         borderRadius: BorderRadius.circular(12),
+                    //         image: DecorationImage(
+                    //           image: NetworkImage(loc.imageUrl),
+                    //           fit: BoxFit.cover,
+                    //         ),
+                    //       ),
+                    //       child: Padding(
+                    //         padding: const EdgeInsets.all(8.0),
+                    //         child: Column(
+                    //           crossAxisAlignment: CrossAxisAlignment.start,
+                    //           children: [
+                    //             Text(loc.locationName,
+                    //                 style: const TextStyle(
+                    //                     color: Colors.white,
+                    //                     fontWeight: FontWeight.bold)),
+                    //             Text(loc.address,
+                    //                 style: const TextStyle(color: Colors.white)),
+                    //           ],
+                    //         ),
+                    //       ),
+                    //     ))
+                    //         .toList(),
+                    //   ),
+                    // )
+                    //     : Text(errormessage, style: const TextStyle(color: SubTextColor, fontSize: 14)),
                   ],
                 ),
               ),
@@ -137,7 +243,7 @@ class SummationPage extends StatelessWidget {
                           horizontal: 18,
                           vertical: 10,
                         ),
-                        children: const [PostDetailPage()],
+                        children: [PostDetailPage(post: post)],
                       ),
                     ),
 

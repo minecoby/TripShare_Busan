@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:seagull/model/post_model.dart';
+import 'package:seagull/api/model/post_model.dart';
 import 'package:seagull/constants/url.dart'; // ✅ 이거 추가!
 
 class PostController {

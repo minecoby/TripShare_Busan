@@ -1,39 +1,50 @@
 import 'package:flutter/material.dart';
+import 'package:seagull/api/controller/PostPage/post_commentAdd_controller.dart';
+import 'package:seagull/api/model/PostPage/post_commentAdd_model.dart';
+import 'package:seagull/api/model/PostPage/post_summary_model.dart';
+import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-/// 댓글 모델 정의
-class Comment {
-  final String userName;
-  final String text;
-  final DateTime timestamp;
-
-  Comment({
-    required this.userName,
-    required this.text,
-    required this.timestamp,
-  });
-}
-
-/// 게시물 상세 페이지
 class PostDetailPage extends StatefulWidget {
-  const PostDetailPage({super.key});
+  final PostDetail post;
 
+  const PostDetailPage({super.key, required this.post});
   @override
   State<PostDetailPage> createState() => _PostDetailPageState();
 }
 
 class _PostDetailPageState extends State<PostDetailPage> {
-  final List<Comment> _comments = [];
-  final TextEditingController _commentController = TextEditingController();
+  final TextEditingController _commentUserWritingController = TextEditingController();
   bool _showComments = true;
   final DateTime postTime = DateTime(2025, 7, 1, 00, 00);
 
-  void _addComment(String text) {
+  final CommentController commentController = Get.put(CommentController());
+
+  String? token;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadToken();
+  }
+
+  Future<void> _loadToken() async {
+    final prefs = await SharedPreferences.getInstance();
     setState(() {
-      _comments.add(
-        Comment(userName: '(댓글작성자닉네임)', text: text, timestamp: DateTime.now()),
-      );
-      _commentController.clear();
+      token = prefs.getString('access_token');
     });
+  }
+
+
+  void _addComment(String text) async {
+    final commentController = Get.put(CommentController());
+    final postId = widget.post.id;
+    final userId = 1; // 실제 로그인한 유저 ID로 바꿔주세요
+
+    await commentController.addComment(
+      CommentAdd(postId: postId, userId: userId, content: text),
+    );
+
   }
 
   String _formatTimeAgo(DateTime time) {
@@ -46,6 +57,8 @@ class _PostDetailPageState extends State<PostDetailPage> {
 
   @override
   Widget build(BuildContext context) {
+    final post = widget.post;
+
     return Padding(
       padding: EdgeInsetsGeometry.only(top: 26),
       child: Column(
@@ -53,7 +66,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
         children: [
           // 제목
           Text(
-            '여행을 떠나요',
+            post.title,
             style: Theme.of(
               context,
             ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
@@ -74,20 +87,20 @@ class _PostDetailPageState extends State<PostDetailPage> {
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    '(작성자닉네임) · ${_formatTimeAgo(postTime)}',
+                    '${post.userName} · ${_formatTimeAgo(postTime)}',
                     style: TextStyle(color: Colors.grey[600]),
                   ),
                 ],
               ),
               Row(
-                children: const [
+                children: [
                   Icon(Icons.favorite_border, size: 16),
                   SizedBox(width: 4),
-                  Text('0'),
+                  Text('${post.likeCount}'),
                   SizedBox(width: 8),
                   Icon(Icons.comment, size: 16),
                   SizedBox(width: 4),
-                  Text('0'),
+                  Text('${post.commentCount}'),
                 ],
               ),
             ],
@@ -96,56 +109,56 @@ class _PostDetailPageState extends State<PostDetailPage> {
 
           // 본문 텍스트
           Text(
-            '화명동은 부산 북구에 위치한 주거 중심지로, 금정산과 낙동강 사이에 자리 잡아 자연과 도시가 조화를 이루는 지역입니다. 2000년대 화명 신시가지 개발로 대규모 아파트 단지가 조성되며 인구가 급증하였고, 현재는 화명1·2·3동으로 나뉘어 있습니다. ',
+            post.content,
             style: const TextStyle(
               fontSize: 14,
               height: 1.6,
               color: Color(0xFF303030),
             ),
           ),
-          const SizedBox(height: 12),
-
-          // 이미지 + 옆에 텍스트
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                width: 150,
-                height: 150,
-                decoration: BoxDecoration(
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.25),
-                      blurRadius: 4,
-                      offset: Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: ClipRRect(
-                  child: Image.asset(
-                    'images/oyaji.jpg',
-                    width: 150,
-                    height: 150,
-                    fit: BoxFit.cover,
-                  ),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  '화명동은 부산 북구에 위치한 주거 중심지로, 금정산과 낙동강 사이에 자리 잡아 자연과 도시가 조화를 이루는 지역입니다. 2000년대 화명 신시가지 개발로 대규모 아파트 단지가 조성되며 인구가 급증하였고,   ',
-                  style: const TextStyle(fontSize: 14, height: 1.6),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-
-          // 이어지는 본문
-          Text(
-            '화명동은 부산 북구에 위치한 주거 중심지로, 금정산과 낙동강 사이에 자리 잡아 자연과 도시가 조화를 이루는 지역입니다. 2000년대 화명 신시가지 개발로 대규모 아파트 단지가 조성되며 인구가 급증하였고, 현재는 화명1·2·3동으로 나뉘어 있습니다. ',
-            style: const TextStyle(fontSize: 14, height: 1.6),
-          ),
+          // const SizedBox(height: 12),
+          //
+          // // 이미지 + 옆에 텍스트
+          // Row(
+          //   crossAxisAlignment: CrossAxisAlignment.start,
+          //   children: [
+          //     Container(
+          //       width: 150,
+          //       height: 150,
+          //       decoration: BoxDecoration(
+          //         boxShadow: [
+          //           BoxShadow(
+          //             color: Colors.black.withOpacity(0.25),
+          //             blurRadius: 4,
+          //             offset: Offset(0, 4),
+          //           ),
+          //         ],
+          //       ),
+          //       child: ClipRRect(
+          //         child: Image.asset(
+          //           'images/oyaji.jpg',
+          //           width: 150,
+          //           height: 150,
+          //           fit: BoxFit.cover,
+          //         ),
+          //       ),
+          //     ),
+          //     const SizedBox(width: 12),
+          //     Expanded(
+          //       child: Text(
+          //         '화명동은 부산 북구에 위치한 주거 중심지로, 금정산과 낙동강 사이에 자리 잡아 자연과 도시가 조화를 이루는 지역입니다. 2000년대 화명 신시가지 개발로 대규모 아파트 단지가 조성되며 인구가 급증하였고,   ',
+          //         style: const TextStyle(fontSize: 14, height: 1.6),
+          //       ),
+          //     ),
+          //   ],
+          // ),
+          // const SizedBox(height: 12),
+          //
+          // // 이어지는 본문
+          // Text(
+          //   '화명동은 부산 북구에 위치한 주거 중심지로, 금정산과 낙동강 사이에 자리 잡아 자연과 도시가 조화를 이루는 지역입니다. 2000년대 화명 신시가지 개발로 대규모 아파트 단지가 조성되며 인구가 급증하였고, 현재는 화명1·2·3동으로 나뉘어 있습니다. ',
+          //   style: const TextStyle(fontSize: 14, height: 1.6),
+          // ),
           const SizedBox(height: 20),
 
           // 댓글 보기 토글
@@ -175,7 +188,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
 
           // 댓글 목록
           if (_showComments)
-            ..._comments.map(
+            ...post.comments.map(
               (c) => Container(
                 margin: const EdgeInsets.only(bottom: 8),
                 padding: const EdgeInsets.fromLTRB(10, 7, 10, 15),
@@ -193,14 +206,14 @@ class _PostDetailPageState extends State<PostDetailPage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            '${c.userName} · ${_formatTimeAgo(c.timestamp)}',
+                            '${c.id} · ', // ${_formatTimeAgo(c.timestamp)}
                             style: const TextStyle(
                               fontSize: 12,
                               color: Colors.grey,
                             ),
                           ),
                           const SizedBox(height: 4),
-                          Text(c.text),
+                          Text(c.content  ),
                         ],
                       ),
                     ),
@@ -208,7 +221,14 @@ class _PostDetailPageState extends State<PostDetailPage> {
                 ),
               ),
             ),
-
+          if (commentController.errorMessage.value.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(top: 8.0),
+              child: Text(
+                commentController.errorMessage.value,
+                style: const TextStyle(color: Color(0xFFE94F4F), fontSize: 12),
+              ),
+            ),
           // 댓글 입력창
           Container(
             margin: const EdgeInsets.only(top: 60),
@@ -231,8 +251,8 @@ class _PostDetailPageState extends State<PostDetailPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        '오야지치',
+                      Text(
+                        token==null? "로그인이 필요합니다" : "userId",
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 4),
@@ -240,7 +260,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
                         children: [
                           Expanded(
                             child: TextField(
-                              controller: _commentController,
+                              controller: _commentUserWritingController,
                               decoration: const InputDecoration(
                                 hintText: '댓글을 남겨보세요 !',
                                 hintStyle: TextStyle(color: Colors.grey),
@@ -251,9 +271,11 @@ class _PostDetailPageState extends State<PostDetailPage> {
                           ),
                           TextButton(
                             onPressed: () {
-                              if (_commentController.text.trim().isNotEmpty) {
-                                _addComment(_commentController.text.trim());
-                              }
+                              if (token==null){
+                                Get.offAllNamed("/login");
+                              } else {if (_commentUserWritingController.text.trim().isNotEmpty) {
+                                _addComment(_commentUserWritingController.text.trim());
+                              }}
                             },
                             child: const Text(
                               '완료',

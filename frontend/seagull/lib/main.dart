@@ -59,7 +59,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         scaffoldBackgroundColor: Colors.white,
       ),
-      initialRoute: '/main',
+      initialRoute: '/login',
       getPages: MainRouter.routes,
       // home: const MainPageView(),
     );

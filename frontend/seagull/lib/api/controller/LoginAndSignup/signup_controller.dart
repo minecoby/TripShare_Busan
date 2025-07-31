@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'dart:convert';
 import 'package:seagull/constants/url.dart';
-import 'package:seagull/model/signup_model.dart';
+import 'package:seagull/api/model/LoginAndSignUp/signup_model.dart';
 import 'package:http/http.dart' as http;
 
 class SignUpController extends GetxController {
