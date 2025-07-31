@@ -179,4 +179,56 @@ public class PostService {
             postInfo.decreaseLikeCount();
         }
     }
+
+    @Transactional(readOnly = true)
+    public List<PostResponseDto> getPopularPosts() {
+        // 조회수 기준 인기 게시글 5개
+        List<Post> popularPosts = postRepository.findTop5ByOrderBySeenCountDesc();
+        return popularPosts.stream().map(post -> {
+            PostInfo postInfo = post.getPostInfo();
+            String region = post.getRegion() != null ? post.getRegion().getRegion() : null;
+            return new PostResponseDto(
+                    post.getId(),
+                    post.getTitle(),
+                    post.getContent(),
+                    post.getSummary(),
+                    post.getCreatedAt(),
+                    post.getUser().getId(),
+                    post.getUser().getName(),
+                    post.getUser().getProfileImage(),
+                    postInfo != null ? postInfo.getLikeCount() : 0,
+                    postInfo != null ? postInfo.getSeenCount() : 0,
+                    post.getComments().size(),
+                    null,
+                    region,
+                    post.getRoute() != null ? post.getRoute().getId() : null
+            );
+        }).collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public List<PostResponseDto> getRecommendedPosts() {
+        // 좋아요 기준 인기 게시글 5개
+        List<Post> recommendedPosts = postRepository.findTop5ByOrderByLikeCountDesc();
+        return recommendedPosts.stream().map(post -> {
+            PostInfo postInfo = post.getPostInfo();
+            String region = post.getRegion() != null ? post.getRegion().getRegion() : null;
+            return new PostResponseDto(
+                    post.getId(),
+                    post.getTitle(),
+                    post.getContent(),
+                    post.getSummary(),
+                    post.getCreatedAt(),
+                    post.getUser().getId(),
+                    post.getUser().getName(),
+                    post.getUser().getProfileImage(),
+                    postInfo != null ? postInfo.getLikeCount() : 0,
+                    postInfo != null ? postInfo.getSeenCount() : 0,
+                    post.getComments().size(),
+                    null,
+                    region,
+                    post.getRoute() != null ? post.getRoute().getId() : null
+            );
+        }).collect(Collectors.toList());
+    }
 }

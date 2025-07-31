@@ -3,6 +3,8 @@ import com.pusan_trip.domain.Post;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface PostRepository extends JpaRepository<Post, Long> {
@@ -18,4 +20,12 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     // 생성일 내림차순으로 최신 게시글 5개
     List<Post> findTop5ByOrderByCreatedAtDesc();
+
+    // 조회수 기준 인기 게시글 5개
+    @Query("SELECT p FROM Post p JOIN p.postInfo pi ORDER BY pi.seenCount DESC")
+    List<Post> findTop5ByOrderBySeenCountDesc();
+
+    // 좋아요 기준 인기 게시글 5개
+    @Query("SELECT p FROM Post p JOIN p.postInfo pi ORDER BY pi.likeCount DESC")
+    List<Post> findTop5ByOrderByLikeCountDesc();
 }

@@ -62,4 +62,18 @@ public class PostController {
         postService.decreaseLikeCount(postId);
         return ResponseEntity.ok().build();
     }
+
+    // 조회수 기준 인기 게시글 목록 (최대 5개)
+    @GetMapping("/popular")
+    public ResponseEntity<List<PostResponseDto>> getPopularPosts() {
+        List<PostResponseDto> popularPosts = postService.getPopularPosts();
+        return ResponseEntity.ok(popularPosts);
+    }
+
+    // 좋아요 기준 추천 게시글 목록 (최대 5개)
+    @GetMapping("/recommend")
+    public ResponseEntity<List<PostResponseDto>> getRecommendedPosts() {
+        List<PostResponseDto> recommendedPosts = postService.getRecommendedPosts();
+        return ResponseEntity.ok(recommendedPosts);
+    }
 }
