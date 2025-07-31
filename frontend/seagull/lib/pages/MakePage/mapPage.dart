@@ -30,14 +30,17 @@ class _MapPageState extends State<MapPage> {
   final NLatLng defaultLatLng = NLatLng(35.2322, 129.0844); // 부산대
   late NaverMapController _mapController;
   final TextEditingController _searchController = TextEditingController();
+  // ignore: unused_field
   Set<NMarker> _markers = {};
 
   double itemHeight = 72.0; // ListTile 대략 높이
+
 
   final ScrollController _scrollController = ScrollController();
 
   List<Map<String, dynamic>> _searchResults = [];
 
+  // ignore: unused_field
   bool _isMapReady = false;
 
   @override
