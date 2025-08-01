@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:seagull/constants/colors.dart';
+import 'package:get/get.dart';
 
 class MainPageView extends StatefulWidget {
   const MainPageView({super.key});
@@ -11,6 +12,25 @@ class MainPageView extends StatefulWidget {
 class _MainPageViewState extends State<MainPageView>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
+
+  final List<Map<String, String>> imageData = [
+    {'path': 'assets/images/busan/junggu.png', 'district': '중구'},
+    {'path': 'assets/images/busan/seogu.png', 'district': '서구'},
+    {'path': 'assets/images/busan/donggu.png', 'district': '동구'},
+    {'path': 'assets/images/busan/yeongdogu.png', 'district': '영도구'},
+    {'path': 'assets/images/busan/busanjin.png', 'district': '부산진구'},
+    {'path': 'assets/images/busan/dongnaegu.png', 'district': '동래구'},
+    {'path': 'assets/images/busan/namgu.png', 'district': '남구'},
+    {'path': 'assets/images/busan/bukgu.png', 'district': '북구'},
+    {'path': 'assets/images/busan/haeundae.png', 'district': '해운대구'},
+    {'path': 'assets/images/busan/sahagu.png', 'district': '사하구'},
+    {'path': 'assets/images/busan/geumjeong.png', 'district': '금정구'},
+    {'path': 'assets/images/busan/gangseo.png', 'district': '강서구'},
+    {'path': 'assets/images/busan/yeonje.png', 'district': '연제구'},
+    {'path': 'assets/images/busan/suyeong.png', 'district': '수영구'},
+    {'path': 'assets/images/busan/sasang.png', 'district': '사상구'},
+    {'path': 'assets/images/busan/gijang.png', 'district': '기장군'},
+  ];
 
   @override
   void initState() {
@@ -26,13 +46,16 @@ class _MainPageViewState extends State<MainPageView>
         children: [
           const SizedBox(height: 90),
           Padding(
-            padding: EdgeInsets.symmetric(horizontal: 35),
+            padding: const EdgeInsets.symmetric(horizontal: 35),
             child: Column(
               children: [
-                //검색창창
+                // 검색창
                 Container(
                   height: 50,
-                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 10,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(100),
@@ -49,7 +72,7 @@ class _MainPageViewState extends State<MainPageView>
                   ),
                 ),
                 const SizedBox(height: 15),
-                //공공데이터 기능 아이콘 4개개
+                // 기능 아이콘 4개
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: List.generate(
@@ -68,7 +91,7 @@ class _MainPageViewState extends State<MainPageView>
             ),
           ),
           const SizedBox(height: 15),
-          //부산 도시 선택
+          // 도시 선택 탭
           Expanded(
             child: Container(
               decoration: const BoxDecoration(
@@ -81,19 +104,19 @@ class _MainPageViewState extends State<MainPageView>
               child: Column(
                 children: [
                   Padding(
-                    padding: EdgeInsets.only(top: 15),
+                    padding: const EdgeInsets.only(top: 15),
                     child: SizedBox(
                       height: 25,
                       child: TabBar(
                         controller: _tabController,
                         indicator: BoxDecoration(
                           borderRadius: BorderRadius.circular(100),
-                          color: MainColor, // 선택된 탭 배경 색상
+                          color: MainColor,
                         ),
                         indicatorSize: TabBarIndicatorSize.label,
                         labelColor: Colors.white,
                         unselectedLabelColor: MainColor,
-                        labelPadding: EdgeInsets.symmetric(horizontal: 2),
+                        labelPadding: const EdgeInsets.symmetric(horizontal: 2),
                         dividerColor: Colors.transparent,
                         tabs: const [
                           Tab(
@@ -145,11 +168,14 @@ class _MainPageViewState extends State<MainPageView>
                       ),
                     ),
                   ),
-
                   Expanded(
                     child: TabBarView(
                       controller: _tabController,
-                      children: List.generate(3, (index) => contentGrid()),
+                      children: [
+                        contentGrid(imageData),
+                        contentGrid([]),
+                        contentGrid([]),
+                      ],
                     ),
                   ),
                 ],
@@ -161,13 +187,13 @@ class _MainPageViewState extends State<MainPageView>
     );
   }
 
-  Widget contentGrid() {
+  Widget contentGrid(List<Map<String, String>> data) {
     return Padding(
       padding: const EdgeInsets.all(15.0),
       child: ScrollConfiguration(
         behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
         child: GridView.builder(
-          itemCount: 16, //도시시 개수
+          itemCount: data.length,
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 2,
             mainAxisSpacing: 12,
@@ -175,10 +201,19 @@ class _MainPageViewState extends State<MainPageView>
             childAspectRatio: 0.75,
           ),
           itemBuilder: (context, index) {
-            return Container(
-              decoration: BoxDecoration(
-                color: Colors.grey[300],
-                borderRadius: BorderRadius.circular(12),
+            final item = data[index];
+            return GestureDetector(
+              onTap: () {
+                Get.toNamed('/list', arguments: item['district']);
+              },
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                  image: DecorationImage(
+                    image: AssetImage(item['path']!),
+                    fit: BoxFit.cover,
+                  ),
+                ),
               ),
             );
           },

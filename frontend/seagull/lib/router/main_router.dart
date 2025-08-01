@@ -1,9 +1,8 @@
 import 'package:get/get.dart';
-
 import 'package:seagull/layout/navigationLayout.dart';
 import 'package:seagull/layout/noLayout.dart';
 import 'package:seagull/pages/MakePage/mapPage.dart';
-import 'package:seagull/pages/MakePage/rootPage.dart';
+import 'package:seagull/pages/MakePage/rootPin.dart';
 import 'package:seagull/pages/MakePage/writePage.dart';
 
 import 'package:seagull/pages/mainPage.dart';

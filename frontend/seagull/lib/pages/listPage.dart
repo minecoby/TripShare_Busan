@@ -7,7 +7,9 @@ import 'package:get/get.dart';
 import 'package:seagull/components/showmodal.dart';
 
 class ListPageView extends StatefulWidget {
-  const ListPageView({super.key});
+  final String selectedDistrict;
+
+  const ListPageView({super.key, this.selectedDistrict = '전체'});
 
   @override
   State<ListPageView> createState() => _ListPageViewState();
@@ -15,6 +17,7 @@ class ListPageView extends StatefulWidget {
 
 class _ListPageViewState extends State<ListPageView> {
   late ScrollController _scrollController;
+
   final List<String> _districts = [
     "전체",
     "중구",
@@ -34,8 +37,8 @@ class _ListPageViewState extends State<ListPageView> {
     "기장군",
     "서구",
   ];
-  String _selected = "전체";
 
+  String _selected = "전체";
   List<Post> _posts = [];
   bool _isLoading = true;
 
@@ -43,6 +46,12 @@ class _ListPageViewState extends State<ListPageView> {
   void initState() {
     super.initState();
     _scrollController = ScrollController();
+
+    _selected = widget.selectedDistrict; // ✅ 초기 구 선택 반영
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _scrollToSelectedDistrict(_selected);
+    });
+
     _fetchPosts();
   }
 
@@ -126,7 +135,7 @@ class _ListPageViewState extends State<ListPageView> {
                 left: 0,
                 right: 0,
                 child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 10),
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -163,14 +172,15 @@ class _ListPageViewState extends State<ListPageView> {
                         },
                       ),
                       GestureDetector(
-                        onTap : () {
+                        onTap: () {
                           Get.toNamed("/write");
                         },
                         child: const Icon(
-                        Icons.add_rounded,
-                        color: Colors.white,
-                        size: 33,
-                      ),)
+                          Icons.add_rounded,
+                          color: Colors.white,
+                          size: 33,
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -197,7 +207,6 @@ class _ListPageViewState extends State<ListPageView> {
                           });
                           _fetchPosts();
                         },
-
                         child: Container(
                           padding: const EdgeInsets.symmetric(
                             horizontal: 20,
