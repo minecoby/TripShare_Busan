@@ -58,18 +58,31 @@ public class PostService {
         postRepository.save(post);
         postInfoRepository.save(postInfo);
         
-        // 루트 생성 (기본 루트)
+        // 루트 생성 (사용자가 제공한 루트 정보 사용)
         Route route = new Route(post);
         post.setRoute(route);
         
-        // 기본 지역 3개 추가
-        RouteLocation location1 = new RouteLocation("기본 지역 1", "기본 주소 1", null, 1);
-        RouteLocation location2 = new RouteLocation("기본 지역 2", "기본 주소 2", null, 2);
-        RouteLocation location3 = new RouteLocation("기본 지역 3", "기본 주소 3", null, 3);
-        
-        route.addRouteLocation(location1);
-        route.addRouteLocation(location2);
-        route.addRouteLocation(location3);
+        // 사용자가 제공한 루트 정보가 있으면 사용, 없으면 기본 루트 생성
+        if (requestDto.getLocations() != null && !requestDto.getLocations().isEmpty()) {
+            for (PostRequestDto.LocationRequestDto locationDto : requestDto.getLocations()) {
+                RouteLocation location = new RouteLocation(
+                    locationDto.getLocationName(),
+                    locationDto.getAddress(),
+                    locationDto.getImageUrl(),
+                    locationDto.getOrderIndex()
+                );
+                route.addRouteLocation(location);
+            }
+        } else {
+            // 기본 지역 3개 추가
+            RouteLocation location1 = new RouteLocation("기본 지역 1", "기본 주소 1", null, 1);
+            RouteLocation location2 = new RouteLocation("기본 지역 2", "기본 주소 2", null, 2);
+            RouteLocation location3 = new RouteLocation("기본 지역 3", "기본 주소 3", null, 3);
+            
+            route.addRouteLocation(location1);
+            route.addRouteLocation(location2);
+            route.addRouteLocation(location3);
+        }
         
         return post.getId();
     }
@@ -123,6 +136,26 @@ public class PostService {
             Region regionEntity = regionRepository.findByRegion(requestDto.getRegion())
                 .orElseThrow(() -> new IllegalArgumentException("Region not found"));
             post.setRegion(regionEntity);
+        }
+        
+        // 루트 정보 업데이트
+        if (requestDto.getLocations() != null && !requestDto.getLocations().isEmpty()) {
+            Route route = post.getRoute();
+            if (route != null) {
+                // 기존 루트 위치 정보 삭제
+                route.getRouteLocations().clear();
+                
+                // 새로운 루트 위치 정보 추가
+                for (PostRequestDto.LocationRequestDto locationDto : requestDto.getLocations()) {
+                    RouteLocation location = new RouteLocation(
+                        locationDto.getLocationName(),
+                        locationDto.getAddress(),
+                        locationDto.getImageUrl(),
+                        locationDto.getOrderIndex()
+                    );
+                    route.addRouteLocation(location);
+                }
+            }
         }
     }
 
