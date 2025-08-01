@@ -10,19 +10,21 @@ class CommentController extends GetxController {
   var comments = <Comment>[].obs;
   final RxString errorMessage = ''.obs;
 
-  Future<void> fetchComments(int postId) async {
-    try {
-      final response = await http.get(Uri.parse('${Urls.apiUrl}comments?postId=$postId'));
-      if (response.statusCode == 200) {
-        final List<dynamic> jsonList = jsonDecode(response.body);
-        comments.value = jsonList.map((e) => Comment.fromJson(e)).toList();
-      } else {
-        errorMessage.value = '댓글 불러오기 실패';
-      }
-    } catch (e) {
-      errorMessage.value = '서버와의 연결이 불안정합니다.';
-    }
-  }
+  // Future<void> fetchComments(int postId) async {
+  //   try {
+  //     final response = await http.get(
+  //       Uri.parse('${Urls.apiUrl}comments?postId=$postId'),
+  //     );
+  //     if (response.statusCode == 200) {
+  //       final List<dynamic> jsonList = jsonDecode(response.body);
+  //       comments.value = jsonList.map((e) => Comment.fromJson(e)).toList();
+  //     } else {
+  //       errorMessage.value = '댓글 불러오기 실패';
+  //     }
+  //   } catch (e) {
+  //     errorMessage.value = '서버와의 연결이 불안정합니다.';
+  //   }
+  // }
 
   Future<void> addComment(CommentAdd comment) async {
     errorMessage.value = '';
@@ -43,7 +45,7 @@ class CommentController extends GetxController {
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        await fetchComments(comment.postId);
+        print(response.body);
       } else {
         errorMessage.value = '댓글 작성 실패: ${response.statusCode}';
       }

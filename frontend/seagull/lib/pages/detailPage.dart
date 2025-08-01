@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:seagull/api/controller/LoginAndSignup/login_controller.dart';
 import 'package:seagull/api/controller/PostPage/post_commentAdd_controller.dart';
+import 'package:seagull/api/controller/PostPage/post_summary_controller.dart';
 import 'package:seagull/api/model/PostPage/post_commentAdd_model.dart';
 import 'package:seagull/api/model/PostPage/post_summary_model.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:async';
 
 class PostDetailPage extends StatefulWidget {
   final PostDetail post;
@@ -14,37 +17,75 @@ class PostDetailPage extends StatefulWidget {
 }
 
 class _PostDetailPageState extends State<PostDetailPage> {
-  final TextEditingController _commentUserWritingController = TextEditingController();
+  final TextEditingController _commentUserWritingController =
+      TextEditingController();
   bool _showComments = true;
   final DateTime postTime = DateTime(2025, 7, 1, 00, 00);
 
-  final CommentController commentController = Get.put(CommentController());
+  late final PostSummaryController postSummaryController;
+
+  late final CommentController commentController;
+
+  List<Comment> comments = [];
+
+  final isRefreshing = false.obs;
+
+  final loginController = Get.find<LoginController>();
+
+  final errormessage = "".obs;
 
   String? token;
-
+  String? userName;
   @override
   void initState() {
     super.initState();
-    _loadToken();
+    _loadLoginInfo();
+    commentController = Get.put(CommentController());
+    postSummaryController = Get.find<PostSummaryController>();
+    comments = postSummaryController.post?.comments ?? [];
   }
 
-  Future<void> _loadToken() async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      token = prefs.getString('access_token');
-    });
+  @override
+  void dispose() {
+    _commentUserWritingController.dispose();
+    super.dispose();
   }
 
+  Future<void> _loadLoginInfo() async {
+    token = await loginController.getAccessToken();
+    userName = await loginController.getUserName();
+    print(token);
+    print(userName);
+    setState(() {}); // 토큰 로딩 후 UI 갱신
+  }
 
   void _addComment(String text) async {
-    final commentController = Get.put(CommentController());
     final postId = widget.post.id;
-    final userId = 1; // 실제 로그인한 유저 ID로 바꿔주세요
 
+    final userIdStr = await loginController.getUserId();
+    if (userIdStr == null) {
+      commentController.errorMessage.value = '로그인이 필요합니다.';
+      return;
+    }
+
+    final userId = int.tryParse(userIdStr);
+    if (userId == null) {
+      commentController.errorMessage.value = '유효하지 않은 사용자 ID입니다.';
+      return;
+    }
     await commentController.addComment(
       CommentAdd(postId: postId, userId: userId, content: text),
     );
 
+    if (commentController.errorMessage.value.isEmpty) {
+      _commentUserWritingController.clear();
+
+      // 최신 댓글 목록 다시 가져오기
+      await postSummaryController.fetchPost(postId);
+      setState(() {
+        comments = postSummaryController.post?.comments ?? [];
+      });
+    }
   }
 
   String _formatTimeAgo(DateTime time) {
@@ -52,6 +93,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
     if (diff.inSeconds < 60) return '방금 전';
     if (diff.inMinutes < 60) return '${diff.inMinutes}분 전';
     if (diff.inHours < 24) return '${diff.inHours}시간 전';
+    if (diff.inDays < 30) return '${diff.inDays}일 전';
     return '${time.year}.${time.month.toString().padLeft(2, '0')}.${time.day.toString().padLeft(2, '0')} ${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
   }
 
@@ -60,7 +102,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
     final post = widget.post;
 
     return Padding(
-      padding: EdgeInsetsGeometry.only(top: 26),
+      padding: EdgeInsets.only(top: 26),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -162,136 +204,192 @@ class _PostDetailPageState extends State<PostDetailPage> {
           const SizedBox(height: 20),
 
           // 댓글 보기 토글
-          GestureDetector(
-            onTap: () {
-              setState(() {
-                _showComments = !_showComments;
-              });
-            },
-            child: Row(
-              children: [
-                const SizedBox(width: 4),
-                Text(
-                  _showComments ? '💬 댓글 숨기기' : '💬 댓글 보기',
-                  style: const TextStyle(fontSize: 14),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              GestureDetector(
+                onTap: () {
+                  setState(() {
+                    _showComments = !_showComments;
+                  });
+                },
+                child: Row(
+                  children: [
+                    const SizedBox(width: 4),
+                    Text(
+                      _showComments ? '💬 댓글 숨기기' : '💬 댓글 보기',
+                      style: const TextStyle(fontSize: 14),
+                    ),
+                    Icon(
+                      _showComments
+                          ? Icons.keyboard_arrow_down
+                          : Icons.keyboard_arrow_up,
+                      size: 16,
+                    ),
+                  ],
                 ),
-                Icon(
-                  _showComments
-                      ? Icons.keyboard_arrow_down
-                      : Icons.keyboard_arrow_up,
-                  size: 16,
+              ),
+              GestureDetector(
+                onTap: () async {
+                  isRefreshing.value = true;
+                  await postSummaryController.fetchPost(widget.post.id);
+                  isRefreshing.value = false;
+                },
+                child: Obx(
+                  () =>
+                      isRefreshing.value
+                          ? const SizedBox(
+                            width: 16,
+                            height: 16,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                          : const Icon(Icons.refresh, size: 16),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
           const SizedBox(height: 12),
 
           // 댓글 목록
           if (_showComments)
-            ...post.comments.map(
-              (c) => Container(
-                margin: const EdgeInsets.only(bottom: 8),
-                padding: const EdgeInsets.fromLTRB(10, 7, 10, 15),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF8F6FF),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const CircleAvatar(radius: 12),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            '${c.id} · ', // ${_formatTimeAgo(c.timestamp)}
-                            style: const TextStyle(
-                              fontSize: 12,
-                              color: Colors.grey,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(c.content  ),
-                        ],
-                      ),
+            ListView.builder(
+                itemCount: comments.length,
+
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemBuilder: (context, index) {
+                  final c = comments[index];
+
+                  return Container(
+                    margin: const EdgeInsets.only(bottom: 8),
+                    padding: const EdgeInsets.fromLTRB(10, 7, 10, 15),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF8F6FF),
+                      borderRadius: BorderRadius.circular(8),
                     ),
-                  ],
-                ),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        CircleAvatar(
+                          radius: 12,
+                          backgroundImage:
+                              c.userProfileImage != null
+                                  ? NetworkImage(c.userProfileImage!)
+                                  : const AssetImage('assets/images/user.png')
+                                      as ImageProvider,
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                '${c.userName} ·${_formatTimeAgo(DateTime.parse(c.createdAt))}',
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(c.content),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
               ),
-            ),
-          if (commentController.errorMessage.value.isNotEmpty)
-            Padding(
-              padding: const EdgeInsets.only(top: 8.0),
-              child: Text(
-                commentController.errorMessage.value,
-                style: const TextStyle(color: Color(0xFFE94F4F), fontSize: 12),
-              ),
-            ),
-          // 댓글 입력창
-          Container(
-            margin: const EdgeInsets.only(top: 60),
-            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-            decoration: BoxDecoration(
-              color: const Color(0xFFF8F6FF),
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const CircleAvatar(
-                  radius: 20,
-                  backgroundImage: NetworkImage(
-                    'https://i.namu.wiki/i/tKKaPU9zpFhU6mvUDX0TZk5I_X-8i2SuqnSSb8uSS97m3xy-ZWLLxXPvGlz26zGMQg3KTj2W46ZSw9OlBAksOcmhGGpO57X6vobqHxugHKnsxZBkAhh9xqIGZnAty5XxTbgYY5khvAqg9kWnL0LgDg.webp',
+          Column(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              if (commentController.errorMessage.value.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.only(top: 8.0),
+                  child: Text(
+                    commentController.errorMessage.value,
+                    style: const TextStyle(
+                      color: Color(0xFFE94F4F),
+                      fontSize: 12,
+                    ),
                   ),
                 ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
+              // 댓글 입력창
+              if (token != null)
+                Container(
+                  margin: const EdgeInsets.only(top: 60),
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 12,
+                    horizontal: 16,
+                  ),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF8F6FF),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        token==null? "로그인이 필요합니다" : "userId",
-                        style: TextStyle(fontWeight: FontWeight.bold),
+                      const CircleAvatar(
+                        radius: 20,
+                        backgroundImage: NetworkImage(
+                          'https://i.namu.wiki/i/tKKaPU9zpFhU6mvUDX0TZk5I_X-8i2SuqnSSb8uSS97m3xy-ZWLLxXPvGlz26zGMQg3KTj2W46ZSw9OlBAksOcmhGGpO57X6vobqHxugHKnsxZBkAhh9xqIGZnAty5XxTbgYY5khvAqg9kWnL0LgDg.webp',
+                        ),
                       ),
-                      const SizedBox(height: 4),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: TextField(
-                              controller: _commentUserWritingController,
-                              decoration: const InputDecoration(
-                                hintText: '댓글을 남겨보세요 !',
-                                hintStyle: TextStyle(color: Colors.grey),
-                                border: InputBorder.none,
-                                isDense: true,
-                              ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              userName ?? "로그인이 필요합니다",
+                              style: TextStyle(fontWeight: FontWeight.bold),
                             ),
-                          ),
-                          TextButton(
-                            onPressed: () {
-                              if (token==null){
-                                Get.offAllNamed("/login");
-                              } else {if (_commentUserWritingController.text.trim().isNotEmpty) {
-                                _addComment(_commentUserWritingController.text.trim());
-                              }}
-                            },
-                            child: const Text(
-                              '완료',
-                              style: TextStyle(
-                                color: Colors.black87,
-                                fontWeight: FontWeight.bold,
-                              ),
+                            const SizedBox(height: 4),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: TextField(
+                                    controller: _commentUserWritingController,
+                                    decoration: const InputDecoration(
+                                      hintText: '댓글을 남겨보세요 !',
+                                      hintStyle: TextStyle(color: Colors.grey),
+                                      border: InputBorder.none,
+                                      isDense: true,
+                                    ),
+                                  ),
+                                ),
+                                TextButton(
+                                  onPressed: () {
+                                    if (token == null) {
+                                      Get.offAllNamed("/login");
+                                    } else {
+                                      if (_commentUserWritingController.text
+                                          .trim()
+                                          .isNotEmpty) {
+                                        _addComment(
+                                          _commentUserWritingController.text
+                                              .trim(),
+                                        );
+                                      }
+                                    }
+                                  },
+                                  child: const Text(
+                                    '완료',
+                                    style: TextStyle(
+                                      color: Colors.black87,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ],
                   ),
                 ),
-              ],
-            ),
+            ],
           ),
         ],
       ),

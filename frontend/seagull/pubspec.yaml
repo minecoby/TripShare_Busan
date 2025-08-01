@@ -34,7 +34,7 @@ dependencies:
   flutter_dotenv: ^5.1.0
   http: ^1.2.0
   flutter_naver_map: ^1.2.1
-  intl: ^0.18.1
+  intl: ^0.20.2
   geolocator: ^11.0.0
   shared_preferences: ^2.0.13
 
@@ -42,7 +42,8 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
   image_picker: ^1.1.2
-
+  # extended_text_field: ^16.0.2
+  flutter_quill: 11.4.2
 dev_dependencies:
   flutter_test:
     sdk: flutter

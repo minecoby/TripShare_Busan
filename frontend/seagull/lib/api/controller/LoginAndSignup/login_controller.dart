@@ -32,16 +32,17 @@ class LoginController extends GetxController {
 
       if (response.statusCode == 200) {
         print('response.body: ${response.body}');
-        var data = jsonDecode(response.body);
-        var userName = data['username'];
-        var userId = data['userId'];
-        var accessToken = data['token'];
+        var responseData = jsonDecode(response.body);
+        var userData = responseData['data'];
+        var userName = userData['username'];
+        var userId = userData['userId'].toString();
+        var accessToken = userData['token'];
 
         print('Access Token: $accessToken');
         print('userId: $userId');
         print('userName: $userName');
 
-        // 🔽 로그인 정보 저장
+        //로그인 정보 저장
         await saveLoginInfo(accessToken, userId, userName);
 
         Get.offAllNamed('/main');
@@ -73,5 +74,21 @@ class LoginController extends GetxController {
   Future<String?> getUserId() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString('user_id');
+  }
+
+  Future<String?> getUserName() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('user_name');
+  }
+
+  Future<void> logout() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    // 저장된 모든 로그인 정보 삭제
+    await prefs.remove('access_token');
+    await prefs.remove('user_id');
+    await prefs.remove('user_name');
+
+    Get.offAllNamed('/login');
   }
 }

@@ -19,7 +19,7 @@ class PostSummaryController extends GetxController {
         final data = jsonDecode(response.body);
         print("response.body: ${response.body}");
 
-        post = PostDetail.fromJson(data);
+        post = PostDetail.fromJson(data['data']);
       } else {
         print("게시글을 불러오는 데 실패했습니다");
       }

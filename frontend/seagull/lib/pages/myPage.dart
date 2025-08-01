@@ -105,6 +105,14 @@ class _MyPageViewState extends State<MyPageView> {
                     _SettingItem(text: '닉네임 변경'),
                     SizedBox(height: 20),
                     _SettingItem(text: '비밀번호 변경'),
+                    SizedBox(height: 20),
+                    GestureDetector(
+                      onTap: () {
+                        final loginController = Get.find<LoginController>();
+                        loginController.logout();
+                      },
+                      child: _SettingItem(text: '로그아웃'),
+                    ),
                   ],
                 ),
               ),

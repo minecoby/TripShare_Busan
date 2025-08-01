@@ -163,14 +163,15 @@ class _ListPageViewState extends State<ListPageView> {
                         },
                       ),
                       GestureDetector(
-                        onTap : () {
+                        onTap: () {
                           Get.toNamed("/write");
                         },
                         child: const Icon(
-                        Icons.add_rounded,
-                        color: Colors.white,
-                        size: 33,
-                      ),)
+                          Icons.add_rounded,
+                          color: Colors.white,
+                          size: 33,
+                        ),
+                      ),
                     ],
                   ),
                 ),

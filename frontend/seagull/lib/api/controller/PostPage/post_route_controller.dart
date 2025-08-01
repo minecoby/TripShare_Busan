@@ -8,7 +8,7 @@ import 'package:get/get.dart';
 class RouteController extends GetxController {
   RouteModel? route;
 
-  Future<RouteModel> fetchRoute(int routeId) async {
+  Future<void> fetchRoute(int routeId) async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('access_token');
 
@@ -27,7 +27,10 @@ class RouteController extends GetxController {
     );
 
     if (response.statusCode == 200) {
-      return RouteModel.fromJson(json.decode(response.body));
+      print(response.body);
+
+      final jsonData = json.decode(response.body);
+      route = RouteModel.fromJson(jsonData["data"]);
     } else {
       throw Exception('루트 조회 실패: ${response.statusCode}');
     }

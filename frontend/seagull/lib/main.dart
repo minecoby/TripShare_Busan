@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:seagull/api/controller/LoginAndSignup/login_controller.dart';
 import 'package:seagull/router/main_router.dart';
 import 'package:seagull/pages/mainPage.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -7,27 +8,30 @@ import 'package:seagull/constants/url.dart';
 import 'package:flutter_naver_map/flutter_naver_map.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  Get.put(LoginController());
   await dotenv.load(fileName: 'assets/config/.env');
 
   await FlutterNaverMap().init(
-      clientId: dotenv.env['NAVER_MAP_CLIENT_ID'],
-      onAuthFailed: (ex) {
-        switch (ex) {
-          case NQuotaExceededException(:final message):
-            print("사용량 초과 (message: $message)");
-            break;
-          case NUnauthorizedClientException() ||
-          NClientUnspecifiedException() ||
-          NAnotherAuthFailedException():
-            print("인증 실패: $ex");
-            break;
-        }
-      });
+    clientId: dotenv.env['NAVER_MAP_CLIENT_ID'],
+    onAuthFailed: (ex) {
+      switch (ex) {
+        case NQuotaExceededException(:final message):
+          print("사용량 초과 (message: $message)");
+          break;
+        case NUnauthorizedClientException() ||
+            NClientUnspecifiedException() ||
+            NAnotherAuthFailedException():
+          print("인증 실패: $ex");
+          break;
+      }
+    },
+  );
   await initializeDateFormatting('ko_KR', null);
-  print('✅ dotenv에서 불러온 NAVER_MAP_CLIENT_ID: ${dotenv.env['NAVER_MAP_CLIENT_ID']}');
+  print(
+    '✅ dotenv에서 불러온 NAVER_MAP_CLIENT_ID: ${dotenv.env['NAVER_MAP_CLIENT_ID']}',
+  );
 
   runApp(const MyApp());
 }
@@ -59,7 +63,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         scaffoldBackgroundColor: Colors.white,
       ),
-      initialRoute: '/login',
+      initialRoute: '/write',
       getPages: MainRouter.routes,
       // home: const MainPageView(),
     );
