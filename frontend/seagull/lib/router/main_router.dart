@@ -1,5 +1,4 @@
 import 'package:get/get.dart';
-
 import 'package:seagull/layout/navigationLayout.dart';
 import 'package:seagull/layout/noLayout.dart';
 import 'package:seagull/pages/MakePage/mapPage.dart';

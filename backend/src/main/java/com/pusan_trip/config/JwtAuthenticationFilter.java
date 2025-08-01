@@ -33,7 +33,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         // [1] 인증 없이 통과시킬 경로
         if (uri.equals("/api/users/signup") ||
                 uri.equals("/api/users/login") ||
-                uri.equals("/api/regions")) {
+                uri.startsWith("/api/posts") ||
+                uri.startsWith("/api/regions") ||
+                uri.startsWith("/api/routes") ||
+                uri.startsWith("/api/comments")) {
             filterChain.doFilter(request, response);
             return;
         }
