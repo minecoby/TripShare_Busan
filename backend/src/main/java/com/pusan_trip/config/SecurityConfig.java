@@ -25,7 +25,7 @@ public class SecurityConfig {
         http
                 .securityMatcher("/**") // 전체 요청에 대해 보안 적용
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/users/signup", "/api/users/login", "/api/posts").permitAll()
+                        .requestMatchers("/api/users/signup", "/api/users/login", "/api/posts", "/api/users/*/mypage").permitAll()
                         .anyRequest().authenticated()
                 )
                 .csrf(csrf -> csrf.disable())

@@ -17,8 +17,12 @@ public class PostController {
     // 게시글 생성
     @PostMapping
     public ResponseEntity<Long> createPost(@RequestBody PostRequestDto requestDto) {
-        Long postId = postService.createPost(requestDto);
-        return ResponseEntity.ok(postId);
+        try {
+            Long postId = postService.createPost(requestDto);
+            return ResponseEntity.ok(postId);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     // 게시글 단건 조회
@@ -38,8 +42,12 @@ public class PostController {
     // 게시글 수정
     @PutMapping("/{postId}")
     public ResponseEntity<Void> updatePost(@PathVariable Long postId, @RequestBody PostRequestDto requestDto) {
-        postService.updatePost(postId, requestDto);
-        return ResponseEntity.ok().build();
+        try {
+            postService.updatePost(postId, requestDto);
+            return ResponseEntity.ok().build();
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     // 게시글 삭제
